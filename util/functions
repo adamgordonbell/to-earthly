@@ -1,0 +1,4 @@
+#! /bin/bash
+# shellcheck disable=SC2207 # Arrays are a pain in bash 3
+
+export PYTHONPATH=/Users/adam/sandbox/to-earthly:$PYTHONPATH
