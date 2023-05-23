@@ -9,8 +9,8 @@ from core.io import write, find_first_yml, run_tree, find_first_dockerfile
 inputfolder: str = 'test_cases/python_lint/input'
 outputfolder: str = 'test_cases/python_lint/output'
 
-inputfolder: str = 'test_cases/docker_simple/input'
-outputfolder: str = 'test_cases/docker_simple/output'
+inputfolder: str = 'test_cases/react_simple/input'
+outputfolder: str = 'test_cases/react_simple/output'
 
 def main() -> None:
     yml = find_first_yml(inputfolder)

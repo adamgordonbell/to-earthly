@@ -1,0 +1,22 @@
+VERSION 0.7
+
+all:
+  BUILD +final
+
+base:
+  FROM node:19-alpine3.16
+  WORKDIR /app
+  COPY package.json ./
+  COPY src/ ./src
+  RUN npm install
+  COPY quotes.txt ./quotes.txt
+
+test:
+  FROM +base
+  RUN npm test
+
+final:
+  FROM +base
+  EXPOSE 8003
+  ENTRYPOINT [ "node", "src/index.js" ]
+  SAVE IMAGE --push ezeev/earthly-node-example:gh-actions-only

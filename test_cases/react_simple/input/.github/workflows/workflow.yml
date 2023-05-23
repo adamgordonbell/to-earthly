@@ -7,9 +7,8 @@ on:
   pull_request:
     branches:
       - "main"
-
 jobs:
-  node_service_build:
+   react_service_build:
     environment: "Actions Demo"
     runs-on: ubuntu-latest
     steps:
@@ -22,18 +21,23 @@ jobs:
         with:
           context: ""
           push: true
-          tags: ezeev/earthly-node-example:gh-actions-only
+          tags: ezeev/earthly-react-example:gh-actions-only
       - uses: actions/checkout@v3
       - uses: actions/cache@v2
         with:
           path: node_modules
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          key: ${{ runner.os }}-react-${{ hashFiles('**/package-lock.json') }}
       - uses: actions/setup-node@v3
         with:
           node-version: "19.x"
-      - name: Node Service Build
-        working-directory: / 
-        run: npm install
-      - name: Node Service Test
-        working-directory: /
-        run: npm test
+      - name: React Setup
+        run: >
+          npm install -g typescript &&
+          npm install
+      - name: React Service Build
+        run: >
+          VITE_RUST_SERVER=http://localhost:8000
+          VITE_GO_SERVER=http://localhost:8001
+          VITE_PYTHON_SERVER=http://localhost:8002
+          VITE_NODE_SERVER=http://localhost:8003
+          npm run build

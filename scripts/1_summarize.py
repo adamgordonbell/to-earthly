@@ -5,8 +5,8 @@ from pprint import pprint
 from core.prompts import summarize_gha
 from core.io import write, find_first_yml
 
-inputfolder: str = 'test_cases/docker_simple/input'
-outputfolder: str = 'test_cases/docker_simple/output'
+inputfolder: str = 'test_cases/node_server/input'
+outputfolder: str = 'test_cases/node_server/output'
 
 outputfile: str = f'{outputfolder}/summary.md'
 

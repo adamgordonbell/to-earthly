@@ -6,8 +6,8 @@ from textwrap import dedent
 from core.prompts import summarize_gha, create_dockerfile
 from core.io import write, run_tree, find_first_yml, find_first_dockerfile
 
-inputfolder: str = 'test_cases/docker_simple/input'
-outputfolder: str = 'test_cases/docker_simple/output'
+inputfolder: str = 'test_cases/node_server/input'
+outputfolder: str = 'test_cases/node_server/output'
 
 outputfile: str = f'{outputfolder}/Dockerfile'
 
