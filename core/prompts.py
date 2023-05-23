@@ -40,7 +40,6 @@ dockerfile_tests = [
 # The Dockerfile format here is sort of part way between Earthly and Docker.
 def create_dockerfile(file_structure : str, build_script: str, existing_dockerfile: str) -> str:
     image_list = read("data/images.txt")
-   
     messages=[]
     messages=[
         {"role": "system", "content": dedent(f"""
@@ -48,6 +47,8 @@ def create_dockerfile(file_structure : str, build_script: str, existing_dockerfi
                                                  1) A list of images, that you use to help select the base image to use in your dockerfile. 
                                                  2) A Description of the file structure of the project. Use the file structure to determine what files need to be copied in at each stage of the docker multi-stage build. 
                                                  3) A list of steps to be performed each in a seperate stage of the dockerfile, given as an ordered markdown list of statments to be RUN inside each stage.
+                                                 4) Optionally an existing dockerfile
+                                                 The Dockerfile format has additional features like `SAVE IMAGE`
                                                  Be concise and return only the contents of the dockerfile, wihtout backticks.""")},
         {"role": "user", "content": dockerfile_tests[0][0]},
         {"role": "assistant", "content": dockerfile_tests[0][1]},
@@ -66,16 +67,22 @@ def create_dockerfile(file_structure : str, build_script: str, existing_dockerfi
             ```
            {dedent(build_script)} 
             ```
+
+            ## Existing Dockerfile
+            ```
+           {dedent(existing_dockerfile)} 
+            ```
         """},
         ]
     generated = call_chat_completion_api_cached(
     temperature=0.1, 
     max_tokens=1000,
     messages = messages)
-    return generated + "\n\n" + existing_dockerfile
+    return generated 
 
 earthfile_tests = [
-    (read("data/earthly_fewshot/in1.md"),read("data/earthly_fewshot/out1.md"))
+    (read("data/earthly_fewshot/in1.md"),read("data/earthly_fewshot/out1.md")),
+    (read("data/earthly_fewshot/in2.md"),read("data/earthly_fewshot/out2.md")),
 ]
 
 earthly_basics = read("data/earthly_docs/basics.md") 
@@ -93,6 +100,8 @@ def create_earthfile(dockerfile : str) -> str:
             """)},
         {"role": "user", "content": earthfile_tests[0][0]},
         {"role": "assistant", "content": earthfile_tests[0][1]},
+        {"role": "user", "content": earthfile_tests[1][0]},
+        {"role": "assistant", "content": earthfile_tests[1][1]},
         {"role": "user", "content": dockerfile},
         ]
     pprint(messages)

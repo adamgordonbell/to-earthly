@@ -1,24 +1,12 @@
 VERSION 0.7
 
-FROM alpine:latest
-WORKDIR /app
+all:
+  BUILD +docker
 
-copy-readme:
-  COPY readme.txt /app/readme.txt
-
-docker-build:
-  FROM +copy-readme
-  RUN echo "Build command not applicable in Earthfile. Use 'earthly --push +docker-save' instead."
-
-FROM nginx:latest
-WORKDIR /usr/share/nginx/html
-
-copy-nginx:
-  COPY +copy-readme/readme.txt .
-
-EXPOSE 80
-CMD ["nginx", "-g", "daemon off;"]
-
-docker-save:
-  COPY +copy-nginx .
+docker:
+  FROM nginx:latest
+  WORKDIR /usr/share/nginx/html
+  COPY ./readme.txt .
+  EXPOSE 80
+  CMD ["nginx", "-g", "daemon off;"]
   SAVE IMAGE --push my-image-name:$(date +%s)
