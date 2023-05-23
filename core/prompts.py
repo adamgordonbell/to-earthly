@@ -7,6 +7,11 @@ import time
 
 from core.io import call_chat_completion_api_cached, call_chat_completion_api
 
+summarize_tests = [
+    (read("data/summary_fewshot/in1.yaml"),read("data/summary_fewshot/out1.md")),
+    (read("data/summary_fewshot/in2.yaml"),read("data/summary_fewshot/out2.md"))
+]
+
 def summarize_gha(s : str) -> str:
     messages=[]
     messages=[
@@ -15,8 +20,13 @@ def summarize_gha(s : str) -> str:
             List preconditions like "install python 3.11" before steps requiring them.
             Skip things that aren't revelevant to porting it to a bash script or makefile.
             Skip git cloning, and changing into the repo.
+            Skip prereqs: docker and git.
             Be concise.
             """)},
+        {"role": "user", "content": summarize_tests[0][0]},
+        {"role": "assistant", "content": summarize_tests[0][1]},
+        {"role": "user", "content": summarize_tests[1][0]},
+        {"role": "assistant", "content": summarize_tests[1][1]},
         {"role": "user", "content": s},
         ]
     return call_chat_completion_api_cached(

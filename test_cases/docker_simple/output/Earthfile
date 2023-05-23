@@ -1,0 +1,17 @@
+VERSION 0.7
+FROM alpine:latest
+WORKDIR /app
+
+COPY readme.txt /app/readme.txt
+
+install-docker:
+  RUN echo "Install Docker" && \
+      apk add --no-cache docker
+
+build-image:
+  FROM +install-docker
+  COPY Dockerfile .
+  ARG TIMESTAMP=$(date +%s)
+  RUN echo "Build the Docker image" && \
+      docker build . --file Dockerfile --tag my-image-name:$TIMESTAMP
+  SAVE IMAGE my-image-name:$TIMESTAMP

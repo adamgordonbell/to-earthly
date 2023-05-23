@@ -3,15 +3,16 @@ from pprint import pprint
 
 # from core.io import write_sections
 from core.prompts import summarize_gha
-from core.io import write
+from core.io import write, find_first_yml
 
-inputfile: str = 'data/python4/workflow.yml'
-outputfile: str = 'data/python4/summary.md'
+inputfolder: str = 'test_cases/docker_simple/input'
+outputfolder: str = 'test_cases/docker_simple/output'
+
+outputfile: str = f'{outputfolder}/summary.md'
 
 def main() -> None:
-    with open(inputfile, 'r') as infile:
-        document: str = infile.read()
-    summarize : str = summarize_gha(document)
+    yml = find_first_yml(inputfolder)
+    summarize : str = summarize_gha(yml)
     write(summarize, outputfile)
 
 if __name__ == '__main__':

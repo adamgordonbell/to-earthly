@@ -4,24 +4,19 @@ from textwrap import dedent
 
 # from core.io import write_sections
 from core.prompts import summarize_gha, create_dockerfile
-from core.io import write
+from core.io import write, run_tree, find_first_yml
 
-inputfile: str = 'data/python3/workflow.yml'
-outputfile: str = 'data/python3/Dockerfile'
+inputfolder: str = 'test_cases/docker_simple/input'
+outputfolder: str = 'test_cases/docker_simple/output'
+
+outputfile: str = f'{outputfolder}/Dockerfile'
 
 def main() -> None:
-    with open(inputfile, 'r') as infile:
-        document: str = infile.read()
+    yml :str  = find_first_yml(inputfolder)
   
-    summarize : str = summarize_gha(document)
+    summarize : str = summarize_gha(yml)
 
-    filestructure = dedent("""
-    .
-    ├── Earthfile
-    ├── requirements.txt
-    └── src
-        └── hello.py
-    """)
+    filestructure = run_tree(inputfolder)
     result = create_dockerfile(filestructure, summarize)
     print("Result:\n\n")
     print(result)

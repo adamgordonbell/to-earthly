@@ -4,27 +4,27 @@ from textwrap import dedent
 
 # from core.io import write_sections
 from core.prompts import summarize_gha, create_dockerfile, create_earthfile
-from core.io import write
+from core.io import write, find_first_yml, run_tree
 
-inputfile: str = 'data/python3/workflow.yml'
-outputfile: str = 'data/python3/Dockerfile'
+inputfolder: str = 'test_cases/python_lint/input'
+outputfolder: str = 'test_cases/python_lint/output'
+
+# inputfolder: str = 'test_cases/docker_simple/input'
+# outputfolder: str = 'test_cases/docker_simple/output'
 
 def main() -> None:
-    with open(inputfile, 'r') as infile:
-        document: str = infile.read()
-  
-    summarize : str = summarize_gha(document)
+    yml = find_first_yml(inputfolder)
+    file_structure = run_tree(inputfolder)
+    write(file_structure,f"{outputfolder}/files.txt")
 
-    filestructure = dedent("""
-    .
-    ├── Earthfile
-    ├── requirements.txt
-    └── src
-        └── hello.py
-    """)
-    dockerfile = create_dockerfile(filestructure, summarize)
+    summarize : str = summarize_gha(yml)
+    write(summarize,f"{outputfolder}/summary.md")
+
+    dockerfile = create_dockerfile(file_structure, summarize)
+    write(dockerfile,f"{outputfolder}/Dockerfile")
+
     earthfile = create_earthfile(dockerfile)
-    print(earthfile)
+    write(earthfile,f"{outputfolder}/Earthfile")
 
 if __name__ == '__main__':
     main()

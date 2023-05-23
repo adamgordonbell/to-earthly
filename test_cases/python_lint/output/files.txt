@@ -1,5 +1,4 @@
 .
-├── Earthfile
 ├── requirements.txt
 └── src/
     └── hello.py
