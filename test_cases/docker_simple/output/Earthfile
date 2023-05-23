@@ -1,17 +1,24 @@
 VERSION 0.7
+
 FROM alpine:latest
 WORKDIR /app
 
-COPY readme.txt /app/readme.txt
+copy-readme:
+  COPY readme.txt /app/readme.txt
 
-install-docker:
-  RUN echo "Install Docker" && \
-      apk add --no-cache docker
+docker-build:
+  FROM +copy-readme
+  RUN echo "Build command not applicable in Earthfile. Use 'earthly --push +docker-save' instead."
 
-build-image:
-  FROM +install-docker
-  COPY Dockerfile .
-  ARG TIMESTAMP=$(date +%s)
-  RUN echo "Build the Docker image" && \
-      docker build . --file Dockerfile --tag my-image-name:$TIMESTAMP
-  SAVE IMAGE my-image-name:$TIMESTAMP
+FROM nginx:latest
+WORKDIR /usr/share/nginx/html
+
+copy-nginx:
+  COPY +copy-readme/readme.txt .
+
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]
+
+docker-save:
+  COPY +copy-nginx .
+  SAVE IMAGE --push my-image-name:$(date +%s)

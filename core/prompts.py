@@ -34,19 +34,13 @@ def summarize_gha(s : str) -> str:
     max_tokens=300,
     messages = messages)
 
-def create_dockerfile(file_structure : str, build_script: str) -> str:
+dockerfile_tests = [
+    (read("data/docker_fewshot/in1.md"),read("data/docker_fewshot/out1.Dockerfile"))
+]
+# The Dockerfile format here is sort of part way between Earthly and Docker.
+def create_dockerfile(file_structure : str, build_script: str, existing_dockerfile: str) -> str:
     image_list = read("data/images.txt")
-    input = f""""""
-    test = [
-        # Example 1
-        (
-          # File list
-          """fdfd""",
-          # Mark Down Script
-          """dfdfd"""
-          # Result
-        )
-        ]
+   
     messages=[]
     messages=[
         {"role": "system", "content": dedent(f"""
@@ -55,6 +49,8 @@ def create_dockerfile(file_structure : str, build_script: str) -> str:
                                                  2) A Description of the file structure of the project. Use the file structure to determine what files need to be copied in at each stage of the docker multi-stage build. 
                                                  3) A list of steps to be performed each in a seperate stage of the dockerfile, given as an ordered markdown list of statments to be RUN inside each stage.
                                                  Be concise and return only the contents of the dockerfile, wihtout backticks.""")},
+        {"role": "user", "content": dockerfile_tests[0][0]},
+        {"role": "assistant", "content": dockerfile_tests[0][1]},
         {"role": "user", "content": f"""
             ## Images
             ```
@@ -72,10 +68,11 @@ def create_dockerfile(file_structure : str, build_script: str) -> str:
             ```
         """},
         ]
-    return call_chat_completion_api_cached(
+    generated = call_chat_completion_api_cached(
     temperature=0.1, 
     max_tokens=1000,
     messages = messages)
+    return generated + "\n\n" + existing_dockerfile
 
 earthfile_tests = [
     (read("data/earthly_fewshot/in1.md"),read("data/earthly_fewshot/out1.md"))

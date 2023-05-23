@@ -69,6 +69,23 @@ def find_first_yml(path=None) -> str:
 
     with open(yml_files[0], 'r') as file:
         return file.read()
+    
+
+def find_first_dockerfile(path=None) -> str:
+    if path is None:
+        path = os.getcwd()
+        
+    if not path.endswith("/"):
+        path += "/"
+
+    docker_files = glob.glob(path + "Dockerfile")
+
+    if not docker_files:
+        return ""
+
+    with open(docker_files[0], 'r') as file:
+        return file.read()
+
 
 def run_tree(path=None, level=2) -> str:
     initial_directory = os.getcwd()
