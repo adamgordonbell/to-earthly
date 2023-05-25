@@ -83,6 +83,7 @@ def create_dockerfile(file_structure : str, build_script: str, existing_dockerfi
 earthfile_tests = [
     (read("data/earthly_fewshot/in1.md"),read("data/earthly_fewshot/out1.md")),
     (read("data/earthly_fewshot/in2.md"),read("data/earthly_fewshot/out2.md")),
+    (read("data/earthly_fewshot/in3.md"),read("data/earthly_fewshot/out3.md")),
 ]
 
 earthly_basics = read("data/earthly_docs/basics.md") 
@@ -102,6 +103,8 @@ def create_earthfile(dockerfile : str) -> str:
         {"role": "assistant", "content": earthfile_tests[0][1]},
         {"role": "user", "content": earthfile_tests[1][0]},
         {"role": "assistant", "content": earthfile_tests[1][1]},
+        {"role": "user", "content": earthfile_tests[2][0]},
+        {"role": "assistant", "content": earthfile_tests[2][1]},
         {"role": "user", "content": dockerfile},
         ]
     pprint(messages)

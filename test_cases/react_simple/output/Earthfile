@@ -28,7 +28,7 @@ build:
 
 docker:
   FROM node:19
-  COPY --from=+build /app /app
+  COPY +build/app /app
   EXPOSE 5173
   ENTRYPOINT [ "npm", "run", "dev", "--host"]
   SAVE IMAGE --push ezeev/earthly-react-example:gh-actions-only
