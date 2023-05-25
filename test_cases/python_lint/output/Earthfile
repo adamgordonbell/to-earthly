@@ -1,24 +1,28 @@
 VERSION 0.7
-FROM python:3.9
+FROM python:3.10
 WORKDIR /app
 
 all:
   BUILD +lint
   BUILD +test
+  BUILD +final
 
-deps:
-  COPY requirements.txt .
+base:
   RUN python -m pip install --upgrade pip
   RUN pip install flake8 pytest
+  COPY requirements.txt .
   RUN if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+  COPY src/ .
 
 lint:
-  FROM +deps
-  COPY src/ .
+  FROM +base
   RUN flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
   RUN flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
 
 test:
-  FROM +deps
-  COPY src/ .
+  FROM +base
   RUN pytest
+
+final:
+  FROM +base
+  CMD ["python", "hello.py"]

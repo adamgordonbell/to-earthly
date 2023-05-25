@@ -20,7 +20,7 @@ docker run -v $(pwd):/input to-earthly
 
 * Get React_simple working
 * SAVE ARTIFACT and SAVE ARTIFACT LOCALLY examplles
-* WITH DOCKER and docker compose examples
+* WITH DOCKER and docker compose examples Test for docker compose
 
 # Doesn't Handle
 

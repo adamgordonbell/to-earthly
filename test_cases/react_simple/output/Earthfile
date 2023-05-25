@@ -1,11 +1,12 @@
 VERSION 0.7
+FROM node:19
+WORKDIR /app
 
 all:
-  BUILD +docker
+  BUILD +build
+  BUILD +final
 
 base:
-  FROM node:19
-  WORKDIR /app
   COPY package.json .
   COPY tsconfig.json .
   COPY tsconfig.node.json .
@@ -26,9 +27,9 @@ build:
   ENV VITE_NODE_SERVER=http://localhost:8003
   RUN npm run build
 
-docker:
+final:
   FROM node:19
-  COPY +build/app /app
+  COPY --from=+build /app /app
   EXPOSE 5173
   ENTRYPOINT [ "npm", "run", "dev", "--host"]
   SAVE IMAGE --push ezeev/earthly-react-example:gh-actions-only
