@@ -103,16 +103,23 @@ def create_dockerfile(file_structure : str, build_script: str, existing_dockerfi
 earthfile_tests = initialize_examples("data/earthly_fewshot")
 
 earthly_basics = read("data/earthly_docs/basics.md") 
+earthly_reference = read("data/earthly_docs/summary1.md") 
 
 def create_earthfile(dockerfile : str) -> str:
     messages=[]
     messages = [{"role": "system", "content": dedent(f"""
+        Use the below documentation on Earthfiles to do a code conversion task.
+        Article:
+        \"\"\"
+        {earthly_basics} 
+        {earthly_reference} 
+        \"\"\"
+
+        Conversion Task:
         You are converting a multistage Dockerfile to an Earthly Earthfile.
         Copy in the files needed just before they are used.
         Be concise and return only the contents of the Earthfile, without backticks.
-
-        Here's a basic tutorial on Earthly's Earthfiles:
-        {earthly_basics} 
+        Make sure to use the Earthfile format for `COPY` and `SAVE ARTIFACT`
         """)}]
     
     for test_input, test_output in earthfile_tests:
@@ -123,7 +130,7 @@ def create_earthfile(dockerfile : str) -> str:
     
     messages.append({"role": "user", "content": dockerfile})
     pprint(messages)
-    return call_chat_completion_api_cached(
-    temperature=0.1, 
+    return call_chat_completion_api(
+    temperature=1.0, 
     max_tokens=1000,
     messages = messages)

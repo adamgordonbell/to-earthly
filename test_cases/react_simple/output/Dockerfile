@@ -22,8 +22,12 @@ ENV VITE_PYTHON_SERVER=http://localhost:8002
 ENV VITE_NODE_SERVER=http://localhost:8003
 RUN npm run build
 
-FROM node:19 AS final
-COPY --from=build /app /app
+FROM node:19.5.0-buster-slim AS final
+
+WORKDIR /app
+COPY --from=build /app .
+
 EXPOSE 5173
 ENTRYPOINT [ "npm", "run", "dev", "--host"]
+
 SAVE IMAGE --push ezeev/earthly-react-example:gh-actions-only

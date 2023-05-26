@@ -6,11 +6,11 @@ from textwrap import dedent
 from core.prompts import summarize_gha, create_dockerfile, create_earthfile
 from core.io import write, find_first_yml, run_tree, find_first_dockerfile
 
-inputfolder: str = 'test_cases/python_lint/input'
-outputfolder: str = 'test_cases/python_lint/output'
+# inputfolder: str = 'test_cases/python_lint/input'
+# outputfolder: str = 'test_cases/python_lint/output'
 
-# inputfolder: str = 'test_cases/react_simple/input'
-# outputfolder: str = 'test_cases/react_simple/output'
+inputfolder: str = 'test_cases/react_simple/input'
+outputfolder: str = 'test_cases/react_simple/output'
 
 # inputfolder: str = 'test_cases/docker_simple/input'
 # outputfolder: str = 'test_cases/docker_simple/output'
@@ -29,7 +29,18 @@ def main() -> None:
 
 
     earthfile = create_earthfile(dockerfile)
-    write(earthfile,f"{outputfolder}/Earthfile")
+    write(earthfile,f"{outputfolder}/Earthfile1")
 
+    earthfile = create_earthfile(dockerfile)
+    write(earthfile,f"{outputfolder}/Earthfile2")
+
+    earthfile = create_earthfile(dockerfile)
+    write(earthfile,f"{outputfolder}/Earthfile3")
+
+    earthfile = create_earthfile(dockerfile)
+    write(earthfile,f"{outputfolder}/Earthfile4")
+
+    earthfile = create_earthfile(dockerfile)
+    write(earthfile,f"{outputfolder}/Earthfile5")
 if __name__ == '__main__':
     main()

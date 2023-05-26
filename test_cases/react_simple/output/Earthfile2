@@ -16,6 +16,7 @@ base:
   COPY public/ ./public
   COPY index.html .
   COPY src/ ./src
+  
   RUN npm install -g typescript
   RUN npm install
 
@@ -31,6 +32,8 @@ final:
   FROM node:19.5.0-buster-slim
   WORKDIR /app
   COPY --from=+build /app .
+  
   EXPOSE 5173
-  ENTRYPOINT [ "npm", "run", "dev", "--host"]
+  ENTRYPOINT ["npm", "run", "dev", "--host"]
+  
   SAVE IMAGE --push ezeev/earthly-react-example:gh-actions-only

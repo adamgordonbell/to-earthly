@@ -3,7 +3,7 @@ FROM node:19.5.0-buster-slim
 WORKDIR /quote-client
 
 deps:
-  COPY --dir src index.html package.json tsconfig.json tsconfig.node.json postcss.config.cjs tailwind.config.cjs vite.config.ts yarn.lock .
+  COPY index.html package.json tsconfig.json tsconfig.node.json postcss.config.cjs tailwind.config.cjs vite.config.ts yarn.lock .
   COPY --dir public .
   RUN yarn global add typescript
   RUN yarn
