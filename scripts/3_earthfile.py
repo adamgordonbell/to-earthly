@@ -3,7 +3,7 @@ from pprint import pprint
 from textwrap import dedent
 
 # from core.io import write_sections
-from core.prompts import summarize_gha, create_dockerfile, create_earthfile
+from core.prompts import summarize_gha, create_dockerfile, create_earthfile, fix_earthfile
 from core.io import write, find_first_yml, run_tree, find_first_dockerfile
 
 # inputfolder: str = 'test_cases/python_lint/input'
@@ -27,20 +27,11 @@ def main() -> None:
     dockerfile = create_dockerfile(file_structure, summarize, extra_docker_file)
     write(dockerfile,f"{outputfolder}/Dockerfile")
 
-
     earthfile = create_earthfile(dockerfile)
-    write(earthfile,f"{outputfolder}/Earthfile1")
+    write(earthfile,f"{outputfolder}/Earthfile")
 
-    earthfile = create_earthfile(dockerfile)
-    write(earthfile,f"{outputfolder}/Earthfile2")
+    earthfile = fix_earthfile(earthfile)
+    write(earthfile,f"{outputfolder}/Earthfile.fix")
 
-    earthfile = create_earthfile(dockerfile)
-    write(earthfile,f"{outputfolder}/Earthfile3")
-
-    earthfile = create_earthfile(dockerfile)
-    write(earthfile,f"{outputfolder}/Earthfile4")
-
-    earthfile = create_earthfile(dockerfile)
-    write(earthfile,f"{outputfolder}/Earthfile5")
 if __name__ == '__main__':
     main()

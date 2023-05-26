@@ -103,7 +103,7 @@ def create_dockerfile(file_structure : str, build_script: str, existing_dockerfi
 earthfile_tests = initialize_examples("data/earthly_fewshot")
 
 earthly_basics = read("data/earthly_docs/basics.md") 
-earthly_reference = read("data/earthly_docs/summary1.md") 
+earthly_reference = read("data/earthly_docs/summary.md") 
 
 def create_earthfile(dockerfile : str) -> str:
     messages=[]
@@ -130,7 +130,39 @@ def create_earthfile(dockerfile : str) -> str:
     
     messages.append({"role": "user", "content": dockerfile})
     pprint(messages)
-    return call_chat_completion_api(
-    temperature=1.0, 
+    return call_chat_completion_api_cached(
+    temperature=0.0, 
+    max_tokens=1000,
+    messages = messages)
+
+earthfilefix_tests = initialize_examples("data/earthlyfix_fewshot")
+
+def fix_earthfile(earthfile : str) -> str:
+    messages=[]
+    messages = [{"role": "system", "content": dedent(f"""
+        Use the below documentation on Earthfiles for this task.
+        Article:
+        \"\"\"
+        {earthly_basics} 
+        {earthly_reference} 
+        \"\"\"
+
+        Task:
+        You are given an Earthfile that has incorrect syntax or doesn't conform to best practices.
+        It may user Dockerfile syntax, or not SAVE ARTIFACT for things it COPY or there just may be a better way to structure things.
+        Return a corrected Earthfile. If no mistakes are found, return it as is.
+        Be concise and return only the contents of the Earthfile, without backticks. 
+        """)}]
+    
+    for test_input, test_output in earthfilefix_tests:
+        messages.extend([
+            {"role": "user", "content": test_input},
+            {"role": "assistant", "content": test_output},
+        ])
+    
+    messages.append({"role": "user", "content": earthfile})
+    pprint(messages)
+    return call_chat_completion_api_cached(
+    temperature=0.0, 
     max_tokens=1000,
     messages = messages)
