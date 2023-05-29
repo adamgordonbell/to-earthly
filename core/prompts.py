@@ -5,7 +5,7 @@ from textwrap import dedent
 from core.io import read
 import time
 
-from core.io import call_chat_completion_api_cached, call_chat_completion_api
+from core import io
 
 import os
 
@@ -45,7 +45,7 @@ def summarize_gha(s : str) -> str:
         ])
     
     messages.append({"role": "user", "content": s})
-    return call_chat_completion_api_cached(
+    return io.call_chat_completion_api_cached(
     temperature=0.1, 
     max_tokens=300,
     messages = messages)
@@ -94,7 +94,7 @@ def create_dockerfile(file_structure : str, build_script: str, existing_dockerfi
        {dedent(existing_dockerfile)} 
         ```
     """})
-    generated = call_chat_completion_api_cached(
+    generated = io.call_chat_completion_api_cached(
     temperature=0.1, 
     max_tokens=1000,
     messages = messages)
@@ -130,7 +130,7 @@ def create_earthfile(dockerfile : str) -> str:
     
     messages.append({"role": "user", "content": dockerfile})
     pprint(messages)
-    return call_chat_completion_api_cached(
+    return io.call_chat_completion_api_cached(
     temperature=0.0, 
     max_tokens=1000,
     messages = messages)
@@ -162,7 +162,31 @@ def fix_earthfile(earthfile : str) -> str:
     
     messages.append({"role": "user", "content": earthfile})
     pprint(messages)
-    return call_chat_completion_api_cached(
+    return io.call_chat_completion_api_cached(
+    temperature=0.0, 
+    max_tokens=1000,
+    messages = messages)
+
+def create_earthfile_cot(dockerfile : str) -> str:
+    messages=[]
+    messages = [{"role": "system", "content": dedent(f"""
+        Use the below documentation on Earthfiles to do a code conversion task.
+        Article:
+        \"\"\"
+        {earthly_basics} 
+        {earthly_reference} 
+        \"\"\"
+
+        Conversion Task:
+        You are converting a multistage Dockerfile to an Earthly Earthfile.
+        Copy in the files needed just before they are used.
+        Be concise and return only the contents of the Earthfile, without backticks.
+        Make sure to use the Earthfile format for `COPY` and `SAVE ARTIFACT`
+        Let's think step by step and then return whole solution.
+        """)}]
+    messages.append({"role": "user", "content": dockerfile})
+    pprint(messages)
+    return io.call_chat_completion_api_cached(
     temperature=0.0, 
     max_tokens=1000,
     messages = messages)

@@ -2,11 +2,6 @@ VERSION 0.7
 FROM python:3.10
 WORKDIR /app
 
-all:
-  BUILD +lint
-  BUILD +test
-  BUILD +final
-
 base:
   RUN python -m pip install --upgrade pip
   RUN pip install flake8 pytest
@@ -28,3 +23,8 @@ final:
   FROM +base
   COPY src/ .
   CMD ["python", "hello.py"]
+
+all:
+  BUILD +lint
+  BUILD +test
+  BUILD +final

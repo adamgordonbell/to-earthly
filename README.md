@@ -19,7 +19,8 @@ docker run -v $(pwd):/input to-earthly
 ## ToDO
 
 * Get React_simple working
-* SAVE ARTIFACT and SAVE ARTIFACT LOCALLY examplles
+ * Frustrated with hit or miss on understanding SAVE ARTIFACT
+ * Maybe try https://learnprompting.org/docs/intermediate/chain_of_thought
 * WITH DOCKER and docker compose examples Test for docker compose
 
 # Doesn't Handle

@@ -1,0 +1,30 @@
+VERSION 0.7
+FROM node:19
+
+all:
+  BUILD +build
+  BUILD +final
+
+base:
+  WORKDIR /app
+  COPY package.json tsconfig.json tsconfig.node.json postcss.config.cjs tailwind.config.cjs vite.config.ts ./
+  COPY --dir public src ./
+  RUN npm install -g typescript
+  RUN npm install
+
+build:
+  FROM +base
+  ENV VITE_RUST_SERVER=http://localhost:8000
+  ENV VITE_GO_SERVER=http://localhost:8001
+  ENV VITE_PYTHON_SERVER=http://localhost:8002
+  ENV VITE_NODE_SERVER=http://localhost:8003
+  RUN npm run build
+  SAVE ARTIFACT /app AS LOCAL /app
+
+final:
+  FROM node:19.5.0-buster-slim
+  WORKDIR /app
+  COPY +build/app .
+  EXPOSE 5173
+  ENTRYPOINT [ "npm", "run", "dev", "--host"]
+  SAVE IMAGE --push ezeev/earthly-react-example:gh-actions-only
