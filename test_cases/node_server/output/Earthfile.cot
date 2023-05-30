@@ -1,3 +1,6 @@
+Here's the Earthfile converted from the multistage Dockerfile:
+
+```
 VERSION 0.7
 
 all:
@@ -7,8 +10,8 @@ base:
   FROM node:19-alpine3.16
   WORKDIR /app
   COPY package.json ./
-  COPY src/ ./src
   RUN npm install
+  COPY src/ ./src
   COPY quotes.txt ./quotes.txt
 
 test:
@@ -20,3 +23,4 @@ final:
   EXPOSE 8003
   ENTRYPOINT [ "node", "src/index.js" ]
   SAVE IMAGE --push $DOCKERHUB_USERNAME/earthly-node-example:gh-actions-only
+```
