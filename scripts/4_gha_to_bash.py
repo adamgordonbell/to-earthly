@@ -20,7 +20,8 @@ def main() -> None:
 
 
     print("Running Stage 2")
-    earthfile = gha_to_bash_prompt.prompt2(file_structure, runfile,dockerfile, buildfile)
+    discuss, earthfile = gha_to_bash_prompt.prompt2(file_structure, runfile,dockerfile, buildfile)
+    io.write(discuss, outputfolder + "EarthfilePlan.md")
     io.write(earthfile, outputfolder + "Earthfile")
 
 if __name__ == '__main__':

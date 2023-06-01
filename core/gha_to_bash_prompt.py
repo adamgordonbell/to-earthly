@@ -73,7 +73,7 @@ def prompt1(s : str) -> Tuple[str, str, str]:
 
 earthly_basics = read("data/earthly_docs/basics.md") 
 
-def prompt2(files: str, run : str, docker : str, build : str) ->  str:
+def prompt2(files: str, run : str, docker : str, build : str) ->  Tuple(str,str):
     identify = guidance(dedent('''
         {{#system~}}
         You are creating an Earthfile from several bash and dockerfiles. I'll share Earthly documentation with you and then describe the conversion process. 
@@ -126,5 +126,5 @@ def prompt2(files: str, run : str, docker : str, build : str) ->  str:
     '''), llm=gpt4)
     out = identify(tutorial="earthly_basics", files=files, run=run,docker=docker, build=build)
     results = extract_code_blocks(out["Earthfile"])
-    return results[0]
+    return (out["discuss"],results[0])
 
