@@ -1,0 +1,49 @@
+Given a GitHub Actions workflow YAML file, summarize how you would recreate the steps of this build using bash and docker.
+You will have three files:
+* `run` which is a bash file that wraps docker. It will call docker build, and afterwards run steps like docker push. Steps like git cloining and changing into the repo aren't needed because this file is stored in the repo.
+* `dockerfile` The dockerfile will be the correct base file to support the programming language needed.
+* `build` A bash file that runs the steps of the build process. It will run inside `dockerfile` in the working directory of the repository. So no need to install dependencies that are included in the base image nor check out the code.
+
+```
+name: GH-Actions-Only
+
+on:
+  push:
+    branches:
+      - "main"
+  pull_request:
+    branches:
+      - "main"
+
+jobs:
+  node_service_build:
+    environment: "Actions Demo"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - uses: docker/build-push-action@v4
+        with:
+          context: ""
+          push: true
+          tags: ezeev/earthly-node-example:gh-actions-only
+      - uses: actions/checkout@v3
+      - uses: actions/cache@v2
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+      - uses: actions/setup-node@v3
+        with:
+          node-version: "19.x"
+      - name: Node Service Build
+        working-directory: / 
+        run: npm install
+      - name: Node Service Test
+        working-directory: /
+        run: npm test
+```
+
+So you should produce those three files. But don't answer the question yet. First just describe how you would approach this problem. Instead discuss what steps should be included, which shouldn't and which file they would be in.
