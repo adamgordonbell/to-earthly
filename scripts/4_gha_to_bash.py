@@ -3,11 +3,21 @@ from pprint import pprint
 
 from core import io, prompts, gha_to_bash_prompt
 
+# works and builds
 inputfolder: str = 'test_cases/python_lint/input/'
 outputfolder: str = 'test_cases/python_lint/output2/'
 
+# works and builds
 inputfolder: str = 'test_cases/react_simple/input/'
 outputfolder: str = 'test_cases/react_simple/output2/'
+
+# works and just skips docker stuff
+inputfolder: str = 'test_cases/node_server/input/'
+outputfolder: str = 'test_cases/node_server/output2/'
+
+# Hallucinates python steps in build.sh
+inputfolder: str = 'test_cases/docker_simple/input/'
+outputfolder: str = 'test_cases/docker_simple/output2/'
 
 def main() -> None:
     print("Gather Data")

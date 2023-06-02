@@ -1,0 +1,25 @@
+VERSION 0.7
+FROM node:19
+WORKDIR /app
+
+deps:
+  COPY package.json package-lock.json ./
+  RUN npm install
+
+test:
+  FROM +deps
+  COPY src/ src/
+  COPY quotes.txt .
+  RUN npm test
+
+all:
+  BUILD +test
+
+# Optional docker-push target
+# docker-push:
+#   FROM +all
+#   ENV DOCKERHUB_USERNAME=<your_dockerhub_username>
+#   ENV DOCKERHUB_TOKEN=<your_dockerhub_token>
+#   RUN docker login -u $DOCKERHUB_USERNAME -p $DOCKERHUB_TOKEN
+#   RUN docker build -t ezeev/earthly-node-example:gh-actions-only -f build.Dockerfile .
+#   RUN docker push ezeev/earthly-node-example:gh-actions-only

@@ -52,6 +52,9 @@ def read(filepath: str) -> str:
         return outfile.read()
 
 def write(contents: str, filepath: str) -> None:
+    directory = os.path.dirname(filepath)
+    if directory:
+        os.makedirs(directory, exist_ok=True)
     with open(filepath, 'w') as outfile:
         outfile.write(contents)
 
