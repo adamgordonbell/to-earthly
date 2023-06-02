@@ -6,6 +6,9 @@ from core import io, prompts, gha_to_bash_prompt
 inputfolder: str = 'test_cases/python_lint/input/'
 outputfolder: str = 'test_cases/python_lint/output2/'
 
+inputfolder: str = 'test_cases/react_simple/input/'
+outputfolder: str = 'test_cases/react_simple/output2/'
+
 def main() -> None:
     print("Gather Data")
     yml = io.find_first_yml(inputfolder)
