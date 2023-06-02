@@ -28,7 +28,11 @@ def extract_code_blocks(markdown : str) -> List[str]:
 
     return matches
 
-def prompt1(s : str) -> Tuple[str, str, str]:
+input1 = io.read("test_cases/python_lint/training/workflow.yml")
+cot1 = io.read("test_cases/python_lint/training/gha_to_bash_prompt_plan.md")
+result1 = io.read("test_cases/python_lint/training/gha_to_bash_prompt_result.md")
+
+def prompt1(s : str) -> Tuple[str, str, str, str, str]:
  
     identify = guidance(dedent('''
         {{#system~}}
@@ -53,6 +57,19 @@ def prompt1(s : str) -> Tuple[str, str, str]:
 
         Do not produce the files. Instead, describe how you would approach this problem. Then go through the yaml document section by section and discuss if steps should be included or omitted, which of the three files it should be in, and how it needs to be adapted to the new format.
         {{~/system}}
+
+        {{#user~}}
+        {input1}
+        {{~/user}} 
+        {{#assistant~}}
+        {{cot1}}
+        {{~/assistant}}
+        {{#user~}}
+        Ok, produce `run.sh`,`build.Dockerfile` and `build.sh`. Remember`build.Dockerfile` should work without volume mounting: files that are needed need to be copied in.
+        {{~/user}}
+        {{#assistant~}}
+        {{result1}}
+        {{~/assistant}}
         {{#user~}}
         {{input}}
         {{~/user}}
@@ -60,20 +77,25 @@ def prompt1(s : str) -> Tuple[str, str, str]:
         {{gen "discuss" temperature=0 max_tokens=2000}}
         {{~/assistant}}
         {{#user~}}
-        Ok, produce the files. Remember`build.Dockerfile` should work without volume mounting. Files that are needed need to be copied in. 
+        Ok, produce `run.sh`,`build.Dockerfile` and `build.sh`. Remember`build.Dockerfile` should work without volume mounting: files that are needed need to be copied in. 
         {{~/user}}
         {{#assistant~}}
-        {{gen "files" temperature=0 max_tokens=2000}}
+        {{gen "files" temperature=0 max_tokens=500}}
         {{~/assistant}}
 
     '''), llm=gpt4)
-    out = identify(input=dedent(s))
+    out = identify(input=dedent(s), input1=input1, cot1=cot1, result1=result1)
     results = extract_code_blocks(out["files"])
-    return (results[0], results[1], results[2])
+    if len(results) != 3:
+        raise ValueError(f"3 Files exepected back. Instead got {len(results)}")
+    return (out["discuss"],out["files"], results[0], results[1], results[2])
 
 earthly_basics = read("data/earthly_docs/basics.md") 
+input1 = io.read("test_cases/python_lint/training/files.md")
+cot1 = io.read("test_cases/python_lint/training/EarthfilePlan.md")
+result1 = io.read("test_cases/python_lint/training/Earthfile")
 
-def prompt2(files: str, run : str, docker : str, build : str) ->  Tuple(str,str):
+def prompt2(files: str, run : str, docker : str, build : str) ->  Tuple[str,str]:
     identify = guidance(dedent('''
         {{#system~}}
         You are creating an Earthfile from several bash and dockerfiles. I'll share Earthly documentation with you and then describe the conversion process. 
@@ -87,6 +109,18 @@ def prompt2(files: str, run : str, docker : str, build : str) ->  Tuple(str,str)
         * `build.Dockerfile`: A dockerfile with the correct base image to support the build steps. This should become the `base` and possibly the `deps` steps in the docker file.
         * `build.sh` A bash file that runs the build steps. These steps should become targets in the Earthfile. 
         {{~/system}}
+        {{#user~}}
+        {input1}
+        {{~/user}} 
+        {{#assistant~}}
+        {{cot1}}
+        {{~/assistant}}
+        {{#user~}}
+        Ok, produce the files. Files that are needed need to be copied in. 
+        {{~/user}}
+        {{#assistant~}}
+        {{result1}}
+        {{~/assistant}}
         {{#user~}}
         `Files:`
         ```
@@ -117,14 +151,17 @@ def prompt2(files: str, run : str, docker : str, build : str) ->  Tuple(str,str)
         {{gen "discuss" temperature=0 max_tokens=2000}}
         {{~/assistant}}
         {{#user~}}
-        Ok, produce the files. Remember`build.Dockerfile` should work without volume mounting. Files that are needed need to be copied in. 
+        Ok, produce the files. Files that are needed need to be copied in. 
         {{~/user}}
         {{#assistant~}}
         {{gen "Earthfile" temperature=0 max_tokens=2000}}
         {{~/assistant}}
 
     '''), llm=gpt4)
-    out = identify(tutorial="earthly_basics", files=files, run=run,docker=docker, build=build)
+    out = identify(tutorial="earthly_basics", input1=input1, cot1=cot1, result1=result1, files=files, run=run,docker=docker, build=build)
     results = extract_code_blocks(out["Earthfile"])
+
+    # if len(results) != 1:
+        # raise ValueError(f"1 Files exepected back. Instead got {len(results)}")
     return (out["discuss"],results[0])
 

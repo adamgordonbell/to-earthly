@@ -3,8 +3,8 @@ from pprint import pprint
 
 from core import io, prompts, gha_to_bash_prompt
 
-inputfolder: str = 'test_cases/node_server/input/'
-outputfolder: str = 'test_cases/node_server/output/'
+inputfolder: str = 'test_cases/python_lint/input/'
+outputfolder: str = 'test_cases/python_lint/output2/'
 
 def main() -> None:
     print("Gather Data")
@@ -13,7 +13,9 @@ def main() -> None:
     io.write(file_structure,outputfolder + "files.txt")
 
     print("Running Stage 1")
-    runfile, dockerfile, buildfile = gha_to_bash_prompt.prompt1(yml)
+    discuss1, result, runfile, dockerfile, buildfile = gha_to_bash_prompt.prompt1(yml)
+    io.write(discuss1, outputfolder + "gha_to_bash_prompt_plan.md")
+    io.write(result, outputfolder + "gha_to_bash_prompt_result.md")
     io.write(runfile, outputfolder + "run.sh")
     io.write(dockerfile, outputfolder + "build.Dockerfile")
     io.write(buildfile, outputfolder + "build.sh")
