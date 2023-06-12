@@ -21,7 +21,7 @@ outputfolder: str = 'test_cases/python_lint/output2/'
 # outputfolder: str = 'test_cases/docker_simple/output2/'
 
 def main() -> None:
-    print("Gather Data")
+    print("Gathering Data")
     yml = io.find_first_yml(inputfolder)
     file_structure = io.run_tree(inputfolder)
     io.write(file_structure,outputfolder + "files.txt")
