@@ -10,34 +10,37 @@ Now, let's go through the files step by step and discuss how the steps should be
 The file structure consists of a `Dockerfile`, `Earthfile`, `index.html`, `output2/`, `package-lock.json`, `package.json`, `postcss.config.cjs`, `public/`, `src/`, `tailwind.config.cjs`, `tsconfig.json`, `tsconfig.node.json`, `vite.config.ts`, and `yarn.lock`. We will need to copy these files into the Earthfile at the appropriate stages.
 
 `run.sh`:
-This script clones the repository, logs in to Docker Hub, builds the Docker image, pushes the Docker image, and runs the build process inside the Docker container. In Earthly, we don't need to wrap Docker commands in a bash script. Instead, we will create targets in the Earthfile to handle the build process.
+This script logs into Docker Hub, builds the Docker image, runs the `build.sh` script inside the Docker container, and then builds and pushes the application Docker image. In Earthly, we don't need to wrap Docker commands in a bash script. Instead, we will create targets in the Earthfile to handle the build process.
 
 `build.Dockerfile`:
-This Dockerfile sets up the base image, working directory, copies files, installs dependencies, and sets the `build.sh` script as executable. We will create a `base` target in the Earthfile to handle these steps.
+This Dockerfile sets up the base image, working directory, copies the `build.sh` script, and installs global dependencies. We will create a `base` target in the Earthfile to handle these steps.
 
 `build.sh`:
-This script sets environment variables and runs the React build process. We will create a `build` target in the Earthfile to handle these steps.
+This script copies the necessary files into the container, installs local dependencies, and runs the React Service Build. We will create separate targets in the Earthfile for copying files, installing dependencies, and building the React application.
 
 Here's how the Earthfile targets should look like:
 
 1. Header
    - The header of the Earthfile starts with a version declaration. `VERSION 0.7`
-   - Then pick the base image. Node 19 in this case.
+   - Then pick the base image. Node.js 19 alpine in this case.
    - Set the working directory to `/app`.
- 
-2. `deps` target:
-   - Copy the `package*.json` files.
-   - Install TypeScript globally.
-   - Run `npm ci`.
-   - Copy the remaining files and directories.
 
-3. `build` target:
-   - Use the `deps` target as a starting point.
-   - Set the environment variables.
-   - Run the React build process with `npm run build`.
+2. `base` target:
+   - Copy the `build.sh` script into the image.
+   - Install global dependencies using npm.
 
-4. `all` target:
-Earthfiles often have an `all` target that is run in CI or by a developer and covers all actions.
-   - Build the `build` target with BUILD `+build` syntax.
+3. `copy-files` target:
+   - Use the `base` target as a starting point.
+   - Copy the necessary files and directories into the Earthfile.
 
-Note that the Earthfile does not handle the Docker Hub login, image push, and repository cloning steps. These steps should be handled in your CI/CD pipeline or a separate script. The Earthfile focuses on the build process itself.
+4. `install-deps` target:
+   - Use the `copy-files` target as a starting point.
+   - Install local dependencies using npm.
+
+5. `build` target:
+   - Use the `install-deps` target as a starting point.
+   - Run the React Service Build with the appropriate environment variables.
+
+6. `all` target:
+   - Earthfiles often have an `all` target that is run in CI or by a developer and covers all actions.
+   - Build the `build` target with the BUILD `+target` syntax.

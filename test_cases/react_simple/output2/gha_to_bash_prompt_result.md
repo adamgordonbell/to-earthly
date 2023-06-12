@@ -1,54 +1,57 @@
-Here are the `run.sh`, `build.Dockerfile`, and `build.sh` files:
-
 `run.sh`:
+
 ```bash
 #!/bin/bash
 
-# Clone the repository (assuming it's not already cloned)
-git clone https://github.com/yourusername/yourrepository.git
-cd yourrepository
-
-# Log in to Docker Hub
+# Docker login
 echo "${DOCKERHUB_TOKEN}" | docker login -u "${DOCKERHUB_USERNAME}" --password-stdin
 
 # Build the Docker image
-docker build -t ezeev/earthly-react-example:gh-actions-only -f build.Dockerfile .
+docker build -t build -f build.Dockerfile .
 
-# Push the Docker image
-docker push ezeev/earthly-react-example:gh-actions-only
+# Run the build.sh script inside the Docker container
+docker run --rm -v $(pwd):/app build ./build.sh
 
-# Run the build process inside the Docker container
-docker run --rm ezeev/earthly-react-example:gh-actions-only
+# Build and push the application Docker image
+IMAGE_NAME="ezeev/earthly-react-example"
+TAG="gh-actions-only"
+docker build . --file Dockerfile --tag $IMAGE_NAME:$TAG
+docker push $IMAGE_NAME:$TAG
 ```
 
 `build.Dockerfile`:
-```Dockerfile
-FROM node:19
 
+```
+# Use a Node.js 19 alpine base image
+FROM node:19-alpine
+
+# Set the working directory
 WORKDIR /app
 
-COPY package*.json ./
+# Copy the build.sh script into the image
+COPY build.sh ./
 
+# Install global dependencies
 RUN npm install -g typescript
-RUN npm ci
-
-COPY . .
-
-CMD ["./build.sh"]
 ```
 
 `build.sh`:
+
 ```bash
 #!/bin/bash
 
-# Set environment variables
-export VITE_RUST_SERVER=http://localhost:8000
-export VITE_GO_SERVER=http://localhost:8001
-export VITE_PYTHON_SERVER=http://localhost:8002
-export VITE_NODE_SERVER=http://localhost:8003
+# Copy the necessary files into the container
+cp -r /app .
 
-# Run the React build process
+# Install local dependencies
+npm install
+
+# Run the React Service Build
+VITE_RUST_SERVER=http://localhost:8000 \
+VITE_GO_SERVER=http://localhost:8001 \
+VITE_PYTHON_SERVER=http://localhost:8002 \
+VITE_NODE_SERVER=http://localhost:8003 \
 npm run build
 ```
 
-In this version, we have removed the volume mounting from the `run.sh` script, and the `build.Dockerfile` now copies all necessary files into the Docker image. The `build.sh` script remains the same, running the build steps inside the Docker container.
+In this version, we have updated the `run.sh` script to include a volume mount for the current working directory to the `/app` directory inside the container. This allows the `build.sh` script to access the necessary files without needing to copy them into the `build.Dockerfile`.

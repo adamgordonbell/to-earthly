@@ -7,7 +7,7 @@ To approach this problem, we will follow these steps:
 Now, let's go through the files step by step and discuss how the steps should be ported to Earthly.
 
 `Files`:
-The file structure consists of a `requirements.txt` file and a `src` directory containing a `hello.py` file. We will need to copy these files into the Earthfile at the appropriate stages.
+The file structure consists of a `requirements.txt` file and a `src` directory containing a `hello.py` file and a `hello_test.py` file. We will need to copy these files into the Earthfile at the appropriate stages.
 
 `run.sh`:
 This script builds the Docker image and runs the `build.sh` script inside the Docker container. In Earthly, we don't need to wrap Docker commands in a bash script. Instead, we will create targets in the Earthfile to handle the build process.

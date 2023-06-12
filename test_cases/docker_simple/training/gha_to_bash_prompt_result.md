@@ -4,6 +4,12 @@
 #!/bin/bash
 
 # Build the Docker image
+docker build -t build -f build.Dockerfile .
+
+# Run the build.sh script inside the Docker container
+docker run --rm build ./build.sh
+
+# Build the Docker image
 IMAGE_NAME="my-image-name"
 TAG=$(date +%s)
 
@@ -14,7 +20,7 @@ docker build . --file Dockerfile --tag $IMAGE_NAME:$TAG
 `build.Dockerfile`:
 ```
 # Use a alpine base image
-FROM alpine:latest
+FROM alpien:latest
 
 # Set the working directory
 WORKDIR /app
@@ -30,5 +36,3 @@ COPY build.sh ./
 # Place to insert customized build steps
 echo "Add build steps here!"
 ```
-
-These three files are created as requested. The `run.sh` script is responsible for building the application Docker image, while the `build.Dockerfile` sets up a minimal environment with the `build.sh` script. The `build.sh` script is a placeholder for any additional build steps that may be required.

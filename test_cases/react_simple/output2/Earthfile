@@ -1,13 +1,17 @@
 VERSION 0.7
-FROM node:19
+FROM node:19-alpine
 WORKDIR /app
 
-deps:
-  COPY package*.json ./
+base:
+  COPY build.sh .
   RUN npm install -g typescript
-  RUN npm ci
+
+copy-files:
+  FROM +base
   COPY index.html .
   COPY output2/ output2/
+  COPY package-lock.json .
+  COPY package.json .
   COPY postcss.config.cjs .
   COPY public/ public/
   COPY src/ src/
@@ -17,12 +21,16 @@ deps:
   COPY vite.config.ts .
   COPY yarn.lock .
 
+install-deps:
+  FROM +copy-files
+  RUN npm install
+
 build:
-  FROM +deps
-  ENV VITE_RUST_SERVER=http://localhost:8000
-  ENV VITE_GO_SERVER=http://localhost:8001
-  ENV VITE_PYTHON_SERVER=http://localhost:8002
-  ENV VITE_NODE_SERVER=http://localhost:8003
+  FROM +install-deps
+  ARG VITE_RUST_SERVER=http://localhost:8000
+  ARG VITE_GO_SERVER=http://localhost:8001
+  ARG VITE_PYTHON_SERVER=http://localhost:8002
+  ARG VITE_NODE_SERVER=http://localhost:8003
   RUN npm run build
 
 all:

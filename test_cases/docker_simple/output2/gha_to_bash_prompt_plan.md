@@ -1,59 +1,52 @@
-To recreate the steps of this GitHub Actions workflow using bash and Docker, we will modify the `run.sh` script to build the Docker image and push it to a container registry. We will also need to update the `build.Dockerfile` to include the necessary steps for building the application Docker image.
+To recreate the steps of this GitHub Actions workflow using bash and Docker, we will modify the `run.sh` script to build the Docker image. We will also need to create the `build.Dockerfile` and the `build.sh` script.
 
-Here's how the files should look like:
+1. Create a `run.sh` script that will be responsible for building the Docker image. This script will be stored in the git repository along with the code.
+
+2. Create a `build.Dockerfile` that will define the base image and install the necessary dependencies for the build process. In this case, we have no steps to run in the build, so we can use `alpine:latest`.
+
+3. Create a `build.sh` script that will run the actual build steps inside the Docker container. This script will be executed within the `build.Dockerfile` image. In this case, there are no steps in the workflow besides building a dockerfile, so `ECHO "Add build steps here"` is all that is needed.
+
+Now, let's go through the YAML file section by section:
+
+- The `on` section specifies when the workflow should run. This is not relevant for our bash and Docker setup, so we can ignore it.
+
+- The `jobs` section contains the actual build steps. We will need to adapt these steps for our `build.sh` and `build.Dockerfile` files.
+
+  - The `actions/checkout@v3` step is not needed, as our `run.sh` and `build.sh` scripts will be stored in the git repository along with the code.
+
+  - The "Build the Docker image" step should be included in the `run.sh`.
+
+  - Since that is all the steps in the file, we conclude that  `build.Dockerfile` won't need any dependencies installed and `build.sh` will only contain an echo to indicate where build steps should be placed.
 
 `run.sh`:
+
 ```bash
 #!/bin/bash
 
 # Build the Docker image
 IMAGE_NAME="my-image-name"
 TAG=$(date +%s)
-docker build . --file build.Dockerfile --tag $IMAGE_NAME:$TAG
-
-# Run the build.sh script inside the Docker container
-docker run --rm $IMAGE_NAME:$TAG ./build.sh
 
 # Build the application Docker image
 docker build . --file Dockerfile --tag $IMAGE_NAME:$TAG
-
-# Push the Docker image to a container registry (optional)
-# docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
-# docker push $IMAGE_NAME:$TAG
 ```
 
 `build.Dockerfile`:
-```Dockerfile
-# Use the Python 3.10 base image
-FROM python:3.10
+```
+# Use a alpine base image
+FROM alpine:latest
 
 # Set the working directory
 WORKDIR /app
 
-# Copy the requirements.txt file and the src directory
-COPY requirements.txt .
-COPY src/ src/
-
-# Install dependencies
-RUN python -m pip install --upgrade pip
-RUN pip install flake8 pytest
-RUN if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-
-# Set the build.sh script as executable
-COPY build.sh .
-RUN chmod +x build.sh
+# Copy the build.sh script into the image
+COPY build.sh ./
 ```
 
 `build.sh`:
 ```bash
 #!/bin/bash
 
-# Run linting with flake8
-flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
-flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
-
-# Run testing with pytest
-pytest
+# Place to insert customized build steps
+echo "Add build steps here!"
 ```
-
-Make sure to give execute permissions to the `run.sh` and `build.sh` scripts by running `chmod +x run.sh` and `chmod +x build.sh`. Then, you can execute the `run.sh` script to build and run the Docker container.

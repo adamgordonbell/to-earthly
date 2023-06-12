@@ -7,42 +7,55 @@ To approach this problem, we will follow these steps:
 Now, let's go through the files step by step and discuss how the steps should be ported to Earthly.
 
 `Files`:
-The file structure consists of a `Dockerfile`, `build.Dockerfile`, `run.sh`, `build.sh`, and a `readme.txt` file. We will need to copy the necessary files into the Earthfile at the appropriate stages.
+The file structure consists of a `Dockerfile` and a `readme.txt` file. We will need to copy these files into the Earthfile at the appropriate stages.
 
 `run.sh`:
-This script builds the Docker image using `build.Dockerfile`, runs the `build.sh` script inside the Docker container, and then builds the final application Docker image using `Dockerfile`. In Earthly, we don't need to wrap Docker commands in a bash script. Instead, we will create targets in the Earthfile to handle the build process.
+This script builds the Docker image using the `Dockerfile`. In Earthly, we don't need to wrap Docker commands in a bash script. Instead, we will create targets in the Earthfile to handle the build process.
 
 `build.Dockerfile`:
-This Dockerfile sets up the base image, working directory, copies files, installs dependencies, and sets the `build.sh` script as executable. We will create a `base` target in the Earthfile to handle these steps.
+This Dockerfile sets up the base image (Alpine), working directory, and copies the `build.sh` script into the image. We will create a `base` target in the Earthfile to handle these steps.
 
 `build.sh`:
-This script runs linting with flake8 and testing with pytest. We will create separate targets in the Earthfile for linting and testing.
+This script is a placeholder for customized build steps. We will create a `build` target in the Earthfile to handle these steps.
 
 Here's how the Earthfile targets should look like:
 
 1. Header
-   - The header of the Eartfile starts with a version declaration. `VERSION 0.7`
-   - Then pick the base image. Python 3.10 in this case.
+   - The header of the Earthfile starts with a version declaration. `VERSION 0.7`
+   - Then pick the base image. Alpine in this case.
    - Set the working directory to `/app`.
  
-2. `deps` target:
-   - Copy the `requirements.txt` file and the `src` directory.
-   - Install dependencies using pip and the `requirements.txt` file.
-   - Copy in the `src` python files
-
-2. `lint` target:
-   - Use the `deps` target as a starting point.
-   - Run flake8 linting commands.
-
-3. `test` target:
-   - Use the `deps` target as a starting point.
-   - Run pytest for testing.
-
-4. `build` target:
-   - Use the `test` target as a starting point.
+2. `base` target:
    - Copy the `Dockerfile` and `readme.txt` files.
-   - Build the final application Docker image.
+   - Copy the `build.sh` script and make it executable.
 
-5. `all` target:
+3. `build` target:
+   - Use the `base` target as a starting point.
+   - Run the `build.sh` script.
+
+4. `all` target:
 Earthfiles often have an `all` target that is run in CI or by a developer and covers all actions.
-   - Build `lint`, `test`, and `build` targets with BUILD `+target` syntax
+   - Build the `build` target with BUILD `+target` syntax.
+
+Here's the Earthfile based on the given files:
+
+```
+VERSION 0.7
+FROM alpine:latest
+WORKDIR /app
+
+base:
+  COPY Dockerfile .
+  COPY readme.txt .
+  COPY build.sh .
+  RUN chmod +x build.sh
+
+build:
+  FROM +base
+  RUN ./build.sh
+
+all:
+  BUILD +build
+```
+
+This Earthfile represents the build process described in the given files and combines the concepts of running bash commands to build something with the ideas of containerization made popular by Docker and Dockerfile.

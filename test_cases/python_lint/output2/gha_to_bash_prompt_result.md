@@ -1,23 +1,25 @@
-Here are the `run.sh`, `build.Dockerfile`, and `build.sh` files:
-
 `run.sh`:
+
 ```bash
 #!/bin/bash
 
 # Build the Docker image
-docker build -t python-build -f build.Dockerfile .
+docker build -t build -f build.Dockerfile .
 
 # Run the build.sh script inside the Docker container
-docker run --rm python-build ./build.sh
+docker run --rm build ./build.sh
 ```
 
 `build.Dockerfile`:
-```Dockerfile
+
+```
+# Use a Python 3.10 base image
 FROM python:3.10
 
+# Set the working directory
 WORKDIR /app
 
-# Copy necessary files
+# Copy the requirements.txt file and the src directory
 COPY requirements.txt .
 COPY src/ src/
 
@@ -26,14 +28,12 @@ RUN python -m pip install --upgrade pip
 RUN pip install flake8 pytest
 RUN if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
-# Copy build.sh script
-COPY build.sh .
-
-# Set build.sh as executable
-RUN chmod +x build.sh
+# Copy the build.sh script into the image
+COPY build.sh ./
 ```
 
 `build.sh`:
+
 ```bash
 #!/bin/bash
 
@@ -44,5 +44,3 @@ flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statist
 # Test with pytest
 pytest
 ```
-
-To run the build process, execute the `run.sh` script. This will build the Docker image using `build.Dockerfile` and then run the `build.sh` script inside the Docker container. The `build.sh` script will perform linting with flake8 and run tests with pytest.

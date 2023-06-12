@@ -1,12 +1,11 @@
-FROM node:19
+# Use a Node.js 19 alpine base image
+FROM node:19-alpine
 
+# Set the working directory
 WORKDIR /app
 
-COPY package*.json ./
+# Copy the build.sh script into the image
+COPY build.sh ./
 
+# Install global dependencies
 RUN npm install -g typescript
-RUN npm ci
-
-COPY . .
-
-CMD ["./build.sh"]

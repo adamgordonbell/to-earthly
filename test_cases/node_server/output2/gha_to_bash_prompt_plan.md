@@ -1,68 +1,80 @@
-To recreate the steps of this GitHub Actions workflow using `run.sh`, `build.Dockerfile`, and `build.sh`, we will follow these steps:
+To recreate the steps of this GitHub Actions workflow using bash and Docker, we will modify the `run.sh` script to build the Docker image, push it to a container registry, and run the Node.js build and test steps. We will also need to create the `build.Dockerfile` and the `build.sh` script.
 
-1. Analyze the given GitHub Actions workflow YAML file and understand the build process.
-2. Create `run.sh`, `build.Dockerfile`, and `build.sh` files to handle the build process.
+1. Create a `run.sh` script that will be responsible for building and running the Docker container. This script will be stored in the git repository along with the code.
 
-Now, let's go through the YAML file step by step and discuss how the steps should be ported to the new format.
+2. Create a `build.Dockerfile` that will define the base image and install the necessary dependencies for the build process. In this case, we will use `node:19` as the base image.
 
-`GitHub Actions workflow YAML`:
+3. Create a `build.sh` script that will run the actual build steps inside the Docker container. This script will be executed within the `build.Dockerfile` image.
 
-1. Checkout the code: This step is not needed in `run.sh`, `build.Dockerfile`, or `build.sh` because these files are stored in the git repository along with the code.
+Now, let's go through the YAML file section by section:
 
-2. Docker login: This step should be included in `run.sh`. Add the following line to `run.sh`:
-   ```
-   docker login -u $DOCKERHUB_USERNAME -p $DOCKERHUB_TOKEN
-   ```
+- The `on` section specifies when the workflow should run. This is not relevant for our bash and Docker setup, so we can ignore it.
 
-3. Docker build and push: This step should be included in `run.sh`. Add the following lines to `run.sh`:
-   ```
-   docker build -t ezeev/earthly-node-example:gh-actions-only -f build.Dockerfile .
-   docker push ezeev/earthly-node-example:gh-actions-only
-   ```
+- The `jobs` section contains the actual build steps. We will need to adapt these steps for our `build.sh` and `build.Dockerfile` files.
 
-4. Cache node_modules: This step is not needed in `run.sh`, `build.Dockerfile`, or `build.sh` because caching is handled by Docker.
+  - The `actions/checkout@v3` step is not needed, as our `run.sh` and `build.sh` scripts will be stored in the git repository along with the code.
 
-5. Setup Node.js: This step should be included in `build.Dockerfile`. Add the following lines to `build.Dockerfile`:
-   ```
-   FROM node:19
-   WORKDIR /app
-   ```
+  - The `docker/login-action@v2` step should be included in the `run.sh`.
 
-6. Node Service Build: This step should be included in `build.sh`. Add the following line to `build.sh`:
-   ```
-   npm install
-   ```
+  - The `docker/build-push-action@v4` step should be included in the `run.sh`.
 
-7. Node Service Test: This step should be included in `build.sh`. Add the following line to `build.sh`:
-   ```
-   npm test
-   ```
+  - The `actions/checkout@v3` step is not needed, as our `run.sh` and `build.sh` scripts will be stored in the git repository along with the code.
+
+  - The `actions/cache@v2` step is not needed, as Docker will handle caching for us.
+
+  - The `actions/setup-node@v3` step is not needed, as we will use a Node.js base image in our `build.Dockerfile`.
+
+  - The "Node Service Build" and "Node Service Test" steps should be included in the `build.sh`.
+
+Here are the files:
 
 `run.sh`:
-```
-#!/bin/bash
-DOCKERHUB_USERNAME=<your_dockerhub_username>
-DOCKERHUB_TOKEN=<your_dockerhub_token>
 
-docker login -u $DOCKERHUB_USERNAME -p $DOCKERHUB_TOKEN
-docker build -t ezeev/earthly-node-example:gh-actions-only -f build.Dockerfile .
-docker push ezeev/earthly-node-example:gh-actions-only
+```bash
+#!/bin/bash
+
+# Docker login
+echo "${DOCKERHUB_TOKEN}" | docker login -u "${DOCKERHUB_USERNAME}" --password-stdin
+
+# Build the Docker image
+docker build -t build -f build.Dockerfile .
+
+# Run the build.sh script inside the Docker container
+docker run --rm build ./build.sh
+
+# Push the Docker image
+IMAGE_NAME="ezeev/earthly-node-example"
+TAG="gh-actions-only"
+docker push $IMAGE_NAME:$TAG
 ```
 
 `build.Dockerfile`:
+
 ```
+# Use a Node.js base image
 FROM node:19
+
+# Set the working directory
 WORKDIR /app
+
+# Copy the package.json and package-lock.json files
 COPY package*.json ./
-RUN npm install
-COPY . .
+
+# Install dependencies
+RUN npm ci
+
+# Copy the build.sh script into the image
+COPY build.sh ./
 ```
 
 `build.sh`:
-```
+
+```bash
 #!/bin/bash
+
+# Run the Node.js build
 npm install
+
+# Run the Node.js tests
 npm test
 ```
-
-Remember to replace `<your_dockerhub_username>` and `<your_dockerhub_token>` with your actual Docker Hub credentials in `run.sh`.

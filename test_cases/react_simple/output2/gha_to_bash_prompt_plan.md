@@ -1,64 +1,82 @@
-To recreate the steps of this GitHub Actions workflow using bash and Docker, we will create the following files:
+To recreate the steps of this GitHub Actions workflow using bash and Docker, we will create the `run.sh`, `build.Dockerfile`, and `build.sh` files.
 
-1. `run.sh`: A bash script that wraps Docker commands and runs the build process.
-2. `build.Dockerfile`: A Dockerfile that sets up the base image, installs dependencies, and copies necessary files.
-3. `build.sh`: A bash script that runs the build steps inside the Docker container.
+1. Create a `run.sh` script that will be responsible for building and running the Docker container. This script will be stored in the git repository along with the code.
 
-Here's how we would approach each section of the GitHub Actions workflow:
+2. Create a `build.Dockerfile` that will define the base image and install the necessary dependencies for the build process. In this case, we will use `node:19-alpine`.
 
-- `on` section: This section defines the events that trigger the workflow. We don't need to include this in our bash and Docker setup, as it's specific to GitHub Actions.
+3. Create a `build.sh` script that will run the actual build steps inside the Docker container. This script will be executed within the `build.Dockerfile` image.
 
-- `jobs` section: This section defines the jobs that run in the workflow. We will recreate these steps in our `run.sh` and `build.sh` scripts.
+Now, let's go through the YAML file section by section:
+
+- The `on` section specifies when the workflow should run. This is not relevant for our bash and Docker setup, so we can ignore it.
+
+- The `jobs` section contains the actual build steps. We will need to adapt these steps for our `build.sh` and `build.Dockerfile` files.
+
+  - The `actions/checkout@v3` step is not needed, as our `run.sh` and `build.sh` scripts will be stored in the git repository along with the code.
+
+  - The `docker/login-action@v2` step should be included in the `run.sh`.
+
+  - The `docker/build-push-action@v4` step should be included in the `run.sh`.
+
+  - The `actions/checkout@v3` step is not needed, as our `run.sh` and `build.sh` scripts will be stored in the git repository along with the code.
+
+  - The `actions/cache@v2` step is not needed, as Docker will handle caching for us.
+
+  - The `actions/setup-node@v3` step is not needed, as we will use the `node:19-alpine` base image in our `build.Dockerfile`.
+
+  - The "React Setup" and "React Service Build" steps should be included in the `build.sh`.
+
+Here are the files:
 
 `run.sh`:
+
 ```bash
 #!/bin/bash
 
-# Clone the repository (assuming it's not already cloned)
-git clone https://github.com/yourusername/yourrepository.git
-cd yourrepository
-
-# Log in to Docker Hub
+# Docker login
 echo "${DOCKERHUB_TOKEN}" | docker login -u "${DOCKERHUB_USERNAME}" --password-stdin
 
 # Build the Docker image
-docker build -t ezeev/earthly-react-example:gh-actions-only -f build.Dockerfile .
+docker build -t build -f build.Dockerfile .
 
-# Push the Docker image
-docker push ezeev/earthly-react-example:gh-actions-only
+# Run the build.sh script inside the Docker container
+docker run --rm build ./build.sh
 
-# Run the build process inside the Docker container
-docker run --rm -v "$(pwd)":/app -w /app ezeev/earthly-react-example:gh-actions-only ./build.sh
+# Build and push the application Docker image
+IMAGE_NAME="ezeev/earthly-react-example"
+TAG="gh-actions-only"
+docker build . --file Dockerfile --tag $IMAGE_NAME:$TAG
+docker push $IMAGE_NAME:$TAG
 ```
 
 `build.Dockerfile`:
-```Dockerfile
-FROM node:19
 
+```
+# Use a Node.js 19 alpine base image
+FROM node:19-alpine
+
+# Set the working directory
 WORKDIR /app
 
-COPY package*.json ./
+# Copy the build.sh script into the image
+COPY build.sh ./
 
+# Install global dependencies
 RUN npm install -g typescript
-RUN npm ci
-
-COPY . .
-
-CMD ["./build.sh"]
 ```
 
 `build.sh`:
+
 ```bash
 #!/bin/bash
 
-# Set environment variables
-export VITE_RUST_SERVER=http://localhost:8000
-export VITE_GO_SERVER=http://localhost:8001
-export VITE_PYTHON_SERVER=http://localhost:8002
-export VITE_NODE_SERVER=http://localhost:8003
+# Install local dependencies
+npm install
 
-# Run the React build process
+# Run the React Service Build
+VITE_RUST_SERVER=http://localhost:8000 \
+VITE_GO_SERVER=http://localhost:8001 \
+VITE_PYTHON_SERVER=http://localhost:8002 \
+VITE_NODE_SERVER=http://localhost:8003 \
 npm run build
 ```
-
-In summary, we have created a `run.sh` script that handles cloning the repository, logging in to Docker Hub, building and pushing the Docker image, and running the build process inside the Docker container. The `build.Dockerfile` sets up the base image, installs dependencies, and copies necessary files. Finally, the `build.sh` script runs the build steps inside the Docker container.

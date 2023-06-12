@@ -7,17 +7,18 @@ from core import io, prompts, gha_to_bash_prompt
 inputfolder: str = 'test_cases/python_lint/input/'
 outputfolder: str = 'test_cases/python_lint/output2/'
 
-# works and builds
-inputfolder: str = 'test_cases/react_simple/input/'
-outputfolder: str = 'test_cases/react_simple/output2/'
+# works and builds but lacks docker steps
+# inputfolder: str = 'test_cases/react_simple/input/'
+# outputfolder: str = 'test_cases/react_simple/output2/'
 
 # works and just skips docker stuff
-inputfolder: str = 'test_cases/node_server/input/'
-outputfolder: str = 'test_cases/node_server/output2/'
+# inputfolder: str = 'test_cases/node_server/input/'
+# outputfolder: str = 'test_cases/node_server/output2/'
 
-# Hallucinates python steps in build.sh
-inputfolder: str = 'test_cases/docker_simple/input/'
-outputfolder: str = 'test_cases/docker_simple/output2/'
+# # no docker push in run.sh
+# # includes build.sh in earthfile, instead of inlining
+# inputfolder: str = 'test_cases/docker_simple/input/'
+# outputfolder: str = 'test_cases/docker_simple/output2/'
 
 def main() -> None:
     print("Gather Data")

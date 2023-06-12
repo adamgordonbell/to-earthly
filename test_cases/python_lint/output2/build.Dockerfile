@@ -1,8 +1,10 @@
+# Use a Python 3.10 base image
 FROM python:3.10
 
+# Set the working directory
 WORKDIR /app
 
-# Copy necessary files
+# Copy the requirements.txt file and the src directory
 COPY requirements.txt .
 COPY src/ src/
 
@@ -11,8 +13,5 @@ RUN python -m pip install --upgrade pip
 RUN pip install flake8 pytest
 RUN if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
-# Copy build.sh script
-COPY build.sh .
-
-# Set build.sh as executable
-RUN chmod +x build.sh
+# Copy the build.sh script into the image
+COPY build.sh ./

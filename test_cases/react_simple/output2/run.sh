@@ -1,17 +1,16 @@
 #!/bin/bash
 
-# Clone the repository (assuming it's not already cloned)
-git clone https://github.com/yourusername/yourrepository.git
-cd yourrepository
-
-# Log in to Docker Hub
+# Docker login
 echo "${DOCKERHUB_TOKEN}" | docker login -u "${DOCKERHUB_USERNAME}" --password-stdin
 
 # Build the Docker image
-docker build -t ezeev/earthly-react-example:gh-actions-only -f build.Dockerfile .
+docker build -t build -f build.Dockerfile .
 
-# Push the Docker image
-docker push ezeev/earthly-react-example:gh-actions-only
+# Run the build.sh script inside the Docker container
+docker run --rm -v $(pwd):/app build ./build.sh
 
-# Run the build process inside the Docker container
-docker run --rm ezeev/earthly-react-example:gh-actions-only
+# Build and push the application Docker image
+IMAGE_NAME="ezeev/earthly-react-example"
+TAG="gh-actions-only"
+docker build . --file Dockerfile --tag $IMAGE_NAME:$TAG
+docker push $IMAGE_NAME:$TAG
