@@ -14,20 +14,6 @@ from typing import Tuple
 dotenv.load_dotenv()
 gpt4 = guidance.llms.OpenAI("gpt-4")
 
-import re
-
-# def extract_code_blocks(markdown: str) -> List[str]:
-#     # This regex pattern matches code blocks in markdown
-#     pattern = r"```[a-zA-Z]*\n?(.*?)```"
-
-#     # This finds all code blocks in the markdown string
-#     matches = re.findall(pattern, markdown, re.DOTALL|re.MULTILINE)
-
-#     # Remove any leading/trailing white space from the code block
-#     matches = [match.strip() for match in matches]
-
-#     return matches
-
 input1 = io.relative_read("test_cases/python_lint/training/workflow.yml")
 cot1 = io.relative_read("test_cases/python_lint/training/gha_to_bash_prompt_plan.md")
 result1 = io.relative_read("test_cases/python_lint/training/gha_to_bash_prompt_result.md")
@@ -37,7 +23,7 @@ cot2 = io.relative_read("test_cases/docker_simple/training/gha_to_bash_prompt_pl
 result2 = io.relative_read("test_cases/docker_simple/training/gha_to_bash_prompt_result.md")
 
 # Seems like we should pass in file structure as well?
-def prompt1(s : str) -> Tuple[str, str, str, str, str]:
+def prompt1(gha : str, files: str) -> Tuple[str, str, str, str, str]:
  
     identify = guidance(dedent('''
         {{#system~}}
@@ -97,7 +83,7 @@ def prompt1(s : str) -> Tuple[str, str, str, str, str]:
 
         {{~! Generate Answer~}}
         {{#user~}}
-        {{input}}
+        {{gha}}
         {{~/user}}
         {{#assistant~}}
         {{gen "discuss" temperature=0 max_tokens=2000}}
@@ -112,7 +98,7 @@ def prompt1(s : str) -> Tuple[str, str, str, str, str]:
         {{~/assistant}}
 
     '''), llm=gpt4)
-    out = identify(input=dedent(s), input1=input1, cot1=cot1, result1=result1, input2=input2, cot2=cot2, result2=result2)
+    out = identify(gha=dedent(gha), input1=input1, cot1=cot1, result1=result1, input2=input2, cot2=cot2, result2=result2)
     print(out["discuss"])
     results = markdown.extract_code_blocks(out["files"])
     # results = extract_code_blocks(out["files"])

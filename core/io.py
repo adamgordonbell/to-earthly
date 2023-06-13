@@ -4,6 +4,7 @@ from pprint import pprint
 from textwrap import dedent
 from joblib import Memory
 from dotenv import load_dotenv
+from collections import defaultdict
 import openai
 import time
 import os
@@ -113,3 +114,40 @@ def run_tree(path=None, level=2) -> str:
         raise Exception(f"Failed to run tree command: {result.stderr}")
 
     return result.stdout
+
+# Like tree but less output
+def print_directory(path, prefix='', level=0, max_level=2) -> str:
+    if level > max_level:
+        return ''
+
+    dir_structure = ''
+    dir_items = defaultdict(list)
+
+    # Group files by extension and directories separately
+    for item in os.listdir(path):
+        # Ignore hidden files and directories
+        if item.startswith('.'):
+            continue
+
+        if os.path.isfile(os.path.join(path, item)):
+            ext = os.path.splitext(item)[1]
+            dir_items[ext].append(item)
+        else:
+            dir_items['folders'].append(item)
+
+    # Generate directory structure, combining files with same extension if more than 3
+    for ext, items in dir_items.items():
+        if ext != 'folders':
+            if len(items) > 3:
+                dir_structure += f"{prefix}├── *{ext}\n"
+            else:
+                for item in items:
+                    dir_structure += f"{prefix}├── {item}\n"
+        else:
+            for item in items:
+                dir_structure += f"{prefix}├── {item}/\n"
+                if level < max_level:
+                    subdir_structure = print_directory(os.path.join(path, item), prefix + "│   ", level + 1, max_level)
+                    dir_structure += subdir_structure
+
+    return dir_structure
