@@ -11,7 +11,7 @@ DEFAULT_EARTHFILE_PATH = '/input/Earthfile'
 DEFAULT_OUTPUT_DIR = '/input/.to_earthly/'
 
 
-def main(input_dir: str, earthfile : str, output_dir: str) -> None:
+def main(input_dir: str, earthfile_path : str, output_dir: str) -> None:
     print("Gathering Data")
     yml = io.find_first_yml(input_dir)
     file_structure = io.run_tree(input_dir)
@@ -31,7 +31,7 @@ def main(input_dir: str, earthfile : str, output_dir: str) -> None:
     print("Running Stage 2")
     discuss, earthfile = gha_to_bash_prompt.prompt2(file_structure, runfile,dockerfile, buildfile)
     io.write(discuss, output_dir + "EarthfilePlan.md")
-    io.write(earthfile, earthfile)
+    io.write(earthfile, earthfile_path)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -40,4 +40,4 @@ if __name__ == '__main__':
     parser.add_argument("--output_dir", help="Output directory location", default=DEFAULT_OUTPUT_DIR)
     args = parser.parse_args()
 
-    main(args.input_dir, args.output_dir)
+    main(args.input_dir, args.earthfile, args.output_dir)
