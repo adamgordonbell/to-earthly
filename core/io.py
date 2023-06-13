@@ -51,6 +51,16 @@ def read(filepath: str) -> str:
     with open(filepath, 'r') as outfile:
         return outfile.read()
 
+def relative_read(relative_filepath: str) -> str:
+    # Get the directory of the current script file
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+
+    # Construct the full filepath, by going up one folder
+    full_filepath = os.path.join(script_dir, ".." ,relative_filepath)
+
+    with open(full_filepath, 'r') as outfile:
+        return outfile.read()
+
 def write(contents: str, filepath: str) -> None:
     directory = os.path.dirname(filepath)
     if directory:

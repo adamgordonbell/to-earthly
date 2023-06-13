@@ -28,13 +28,13 @@ import re
 
 #     return matches
 
-input1 = io.read("test_cases/python_lint/training/workflow.yml")
-cot1 = io.read("test_cases/python_lint/training/gha_to_bash_prompt_plan.md")
-result1 = io.read("test_cases/python_lint/training/gha_to_bash_prompt_result.md")
+input1 = io.relative_read("test_cases/python_lint/training/workflow.yml")
+cot1 = io.relative_read("test_cases/python_lint/training/gha_to_bash_prompt_plan.md")
+result1 = io.relative_read("test_cases/python_lint/training/gha_to_bash_prompt_result.md")
 
-input2 = io.read("test_cases/docker_simple/training/workflow.yml")
-cot2 = io.read("test_cases/docker_simple/training/gha_to_bash_prompt_plan.md")
-result2 = io.read("test_cases/docker_simple/training/gha_to_bash_prompt_result.md")
+input2 = io.relative_read("test_cases/docker_simple/training/workflow.yml")
+cot2 = io.relative_read("test_cases/docker_simple/training/gha_to_bash_prompt_plan.md")
+result2 = io.relative_read("test_cases/docker_simple/training/gha_to_bash_prompt_result.md")
 
 # Seems like we should pass in file structure as well?
 def prompt1(s : str) -> Tuple[str, str, str, str, str]:
@@ -121,10 +121,10 @@ def prompt1(s : str) -> Tuple[str, str, str, str, str]:
         raise ValueError(f"3 Files exepected back. Instead got {len(results)}")
     return (out["discuss"],out["files"], results[0], results[1], results[2])
 
-earthly_basics = read("data/earthly_docs/basics.md") 
-input1 = io.read("test_cases/python_lint/training/files.md")
-cot1 = io.read("test_cases/python_lint/training/EarthfilePlan.md")
-result1 = io.read("test_cases/python_lint/training/Earthfile")
+earthly_basics = io.relative_read("data/earthly_docs/basics.md") 
+input1 = io.relative_read("test_cases/python_lint/training/files.md")
+cot1 = io.relative_read("test_cases/python_lint/training/EarthfilePlan.md")
+result1 = io.relative_read("test_cases/python_lint/training/Earthfile")
 
 def prompt2(files: str, run : str, docker : str, build : str) ->  Tuple[str,str]:
     identify = guidance(dedent('''

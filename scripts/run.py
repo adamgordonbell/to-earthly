@@ -3,7 +3,7 @@ from pprint import pprint
 from textwrap import dedent
 import argparse
 
-from core import io, prompts, gha_to_bash_prompt
+from core import io, gha_to_bash_prompt
 
 # Default directories
 DEFAULT_INPUT_DIR = '/input/'
