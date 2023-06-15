@@ -79,7 +79,7 @@ def find_first_yml(path=None) -> str:
     yml_files = glob.glob(path + ".github/workflows/*.yml")
 
     if not yml_files:
-        raise Exception("No yml files found.")
+        raise Exception("No yml files found. Process will stop.")
 
     with open(yml_files[0], 'r') as file:
         return file.read()
@@ -116,7 +116,7 @@ def run_tree(path=None, level=2) -> str:
     return result.stdout
 
 # Like tree but less output
-def print_directory(path, prefix='', level=0, max_level=2) -> str:
+def print_directory(path, prefix='', level=0, max_level=1) -> str:
     if level > max_level:
         return ''
 

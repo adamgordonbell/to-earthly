@@ -32,6 +32,11 @@ def main(input_dir: str, earthfile_path : str, output_dir: str) -> None:
     print("Running Stage 2")
     discuss, earthfile = gha_to_bash_prompt.prompt2(file_structure, runfile,dockerfile, buildfile)
     io.write(discuss, output_dir + "EarthfilePlan.md")
+    io.write(earthfile, output_dir + "Earthfile.1")
+
+    print("Running Stage 3")
+    discuss, earthfile = gha_to_bash_prompt.prompt3(earthfile, yml, file_structure)
+    io.write(discuss, output_dir + "EarthfileFixPlan.md")
     io.write(earthfile, earthfile_path)
 
 if __name__ == '__main__':

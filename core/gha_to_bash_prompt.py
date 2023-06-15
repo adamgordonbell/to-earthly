@@ -83,7 +83,15 @@ def prompt1(gha : str, files: str) -> Tuple[str, str, str, str, str]:
 
         {{~! Generate Answer~}}
         {{#user~}}
+        Files:
+        ```
+        {{files}}
+        ```
+
+        GitHub Actions workflow:
+        ```
         {{gha}}
+        ```
         {{~/user}}
         {{#assistant~}}
         {{gen "discuss" temperature=0 max_tokens=2000}}
@@ -98,7 +106,7 @@ def prompt1(gha : str, files: str) -> Tuple[str, str, str, str, str]:
         {{~/assistant}}
 
     '''), llm=gpt4)
-    out = identify(gha=dedent(gha), input1=input1, cot1=cot1, result1=result1, input2=input2, cot2=cot2, result2=result2)
+    out = identify(gha=dedent(gha), files=files, input1=input1, cot1=cot1, result1=result1, input2=input2, cot2=cot2, result2=result2)
     print(out["discuss"])
     results = markdown.extract_code_blocks(out["files"])
     # results = extract_code_blocks(out["files"])
@@ -108,6 +116,9 @@ def prompt1(gha : str, files: str) -> Tuple[str, str, str, str, str]:
     return (out["discuss"],out["files"], results[0], results[1], results[2])
 
 earthly_basics = io.relative_read("data/earthly_docs/basics.md") 
+earthly_reference = io.relative_read("data/earthly_docs/summary.md") 
+earthly_tips = io.relative_read("data/earthly_docs/tips.md") 
+
 input1 = io.relative_read("test_cases/python_lint/training/files.md")
 cot1 = io.relative_read("test_cases/python_lint/training/EarthfilePlan.md")
 result1 = io.relative_read("test_cases/python_lint/training/Earthfile")
@@ -117,7 +128,7 @@ def prompt2(files: str, run : str, docker : str, build : str) ->  Tuple[str,str]
         {{#system~}}
         You are creating an Earthfile from several bash and dockerfiles. I'll share Earthly documentation with you and then describe the conversion process. 
 
-        {{tutorial}}
+        {{earthly_basics}}
         The tutorial is over. I will now describe the task.
 
         You are creating an Earthfile from the following inputs. 
@@ -175,10 +186,69 @@ def prompt2(files: str, run : str, docker : str, build : str) ->  Tuple[str,str]
         {{~/assistant}}
 
     '''), llm=gpt4)
-    out = identify(tutorial="earthly_basics", input1=input1, cot1=cot1, result1=result1, files=files, run=run,docker=docker, build=build)
+    out = identify(earthly_basics=earthly_basics, input1=input1, cot1=cot1, result1=result1, files=files, run=run,docker=docker, build=build)
     results = markdown.extract_code_blocks(out["Earthfile"])
 
     # if len(results) != 1:
-        # raise ValueError(f"1 Files exepected back. Instead got {len(results)}")
+        # raise ValueError(f"1 Files exepected back. Instead got {len(results)}. Stoping conversion")
     return (out["discuss"],results[0])
 
+def prompt3(earthfile: str, gha : str, files: str) ->  Tuple[str,str]:
+    identify = guidance(dedent('''
+        {{#system~}}
+        Use the below documentation on Earthfiles to do a code conversion task.
+        <<Article>>
+        {{earthly_basics}}
+        {{earthly_tips}}
+        <<Article>>
+
+        The tutorial is over. I will now describe the task.
+
+        Task:
+        You are given an Earthfile that has incorrect syntax or doesn't conform to best practices.
+        The Earthfile is based on a GitHub Actions workflow. this is also given and should match it as closely as possible.
+        The file structure of the solution is also included because in an Earthfile files must be explicitly copied into context.
+        The mistakes may be using Dockerfile syntax, or not SAVE ARTIFACT for things it COPY or there just may be a better way to structure things.
+        Possibly files are copied in that do not exist or a target named `base` is used even though that is reservered.
+
+        Do not produce the file yet. Instead, describe how you would approach this problem. Then go through the Earthfile section by section and discuss any changes that need to be made.
+        
+        {{~/system}}
+        {{#user~}}
+        Files:
+        ```
+        {{files}}
+        ```
+
+        Git Hub Actions:
+        ```
+        {{gha}}
+        ```
+
+        Earthfile:
+        ```
+        {{earthfile}}
+        ```
+        {{~/user}}
+        {{#assistant~}}
+        {{gen "discuss" temperature=0 max_tokens=2000}}
+        {{~/assistant}}
+        {{#user~}}
+        Ok, produce the Earthfile in backticks.
+        {{~/user}}
+        {{#assistant~}}
+        {{gen "Earthfile" temperature=0 max_tokens=2000}}
+        {{~/assistant}}
+
+    '''), llm=gpt4)
+    out = identify(earthly_basics=earthly_basics, 
+                   earthly_tips=earthly_tips, 
+                   input1=input1, 
+                   files=files, 
+                   gha=gha,
+                   earthfile=earthfile)
+    results = markdown.extract_code_blocks(out["Earthfile"])
+
+    # if len(results) != 1:
+        # raise ValueError(f"1 Files exepected back. Instead got {len(results)}. Stoping conversion")
+    return (out["discuss"],results[0])

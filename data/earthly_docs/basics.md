@@ -1,4 +1,3 @@
-<<Earthly Tutorial Start>>
 # Earthly Tutorial
 
 Below you'll find a simple example of an Earthfile. Existing Dockerfiles can easily be ported to Earthly by copying them to an Earthfile and tweaking them slightly.
@@ -357,74 +356,3 @@ hello:
 
 ```
 You can see in the command above that we can pass a flag to `WITH DOCKER` telling it to pull an image from Docker Hub. We can pass other flags to [load in artifacts built by other targets](#loading-an-image) `--load` or even images defined by [docker-compose](#a-real-world-example) `--compose`. These images will be available within the context of `WITH DOCKER`'s docker daemon.
-
-### Loading an Image
-We can load in an image created by another target with the `--load` flag.
-
-```Dockerfile
-my-hello-world:
-    FROM ubuntu
-    CMD echo "hello world"
-    SAVE IMAGE my-hello:latest
-
-hello:
-    FROM earthly/dind:alpine
-    WITH DOCKER --load hello:latest=+my-hello-world
-        RUN docker run hello:latest
-    END
-```
-
-## A Real World Example
-
-One common use case for `WITH DOCKER` is running integration tests that require other services. In this case we need to set up a redis service for our tests. For this we can user a `docker-compose.yml`.
-
-`docker-compose.yml`
-```yml
-version: "3"
-
-services:
-  redis:
-    container_name: local-redis
-    image: redis:6.0-alpine
-    ports:
-      - 127.0.0.1:6379:6379
-    hostname: redis
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:6379"]
-      interval: 1s
-      timeout: 10s
-      retries: 5
-    networks:
-      - go/part6_default
-
-networks:
-  go/part6_default:
-```
-
-```Dockerfile
-VERSION 0.7
-FROM golang:1.15-alpine3.13
-WORKDIR /go-workdir
-
-deps:
-    COPY go.mod go.sum ./
-    RUN go mod download
-    SAVE ARTIFACT go.mod AS LOCAL go.mod
-    SAVE ARTIFACT go.sum AS LOCAL go.sum
-
-test-setup:
-    FROM +deps
-    COPY main.go .
-    COPY main_integration_test.go .
-    ENV CGO_ENABLED=0
-    ENTRYPOINT ["go", "test", "github.com/earthly/earthly/examples/go"]
-    SAVE IMAGE test:latest
-
-integration-tests:
-    FROM earthly/dind:alpine
-    COPY docker-compose.yml ./
-    WITH DOCKER --compose docker-compose.yml --load tests:latest=+test-setup
-        RUN docker run --network=default_go/part6_default tests:latest
-    END
-```
-<<Earthly Tutorial End>>
