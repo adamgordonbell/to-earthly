@@ -17,7 +17,7 @@ memory = Memory(location='data/gpt_cache', verbose=1)
 
 openai.api_key = os.getenv('OPENAI_API_KEY')
 
-# @memory.cache
+@memory.cache
 def call_chat_completion_api_cached(max_tokens, messages,temperature):
     print("running prompt")
     return call_chat_completion_api(max_tokens,messages, temperature)
