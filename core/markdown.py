@@ -1,24 +1,4 @@
 from typing import List
-import re
-import mistune
-
-# class CodeBlockRenderer(mistune.Renderer):
-#     def __init__(self):
-#         super(CodeBlockRenderer, self).__init__()
-#         self.code_blocks = []
-
-#     def block_code(self, code, lang=None):
-#         self.code_blocks.append(code)
-#         return ''  # return an empty string, we are only interested in extracting code blocks
-
-# def extract_code_blocks(markdown: str) -> List[str]:
-#     # Add an extra line with three backticks before each filename
-#     markdown = re.sub(r'\n`', '\n```\n`', markdown)
-
-#     renderer = CodeBlockRenderer()
-#     mistune_markdown = mistune.Markdown(renderer=renderer)
-#     mistune_markdown(markdown)
-#     return renderer.code_blocks
 
 def extract_code_blocks(markdown: str) -> List[str]:
     print(markdown)

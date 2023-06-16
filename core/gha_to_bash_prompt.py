@@ -5,13 +5,20 @@ from textwrap import dedent
 from core.io import read
 import time
 import dotenv 
+import requests
+from io import StringIO
+
 
 from core import io, markdown
 import os
 import guidance
 from typing import Tuple
+import core.boot
 
-dotenv.load_dotenv()
+
+
+
+# dotenv.load_dotenv()
 gpt4 = guidance.llms.OpenAI("gpt-4")
 
 input1 = io.relative_read("test_cases/python_lint/training/workflow.yml")

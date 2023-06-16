@@ -18,15 +18,10 @@ docker run -v $(pwd):/input to-earthly
 
 ## ToDO
 
-* Get React_simple working
- * Frustrated with hit or miss on understanding SAVE ARTIFACT
- * Maybe try https://learnprompting.org/docs/intermediate/chain_of_thought
+* get dockerfile support working
+* get matrix builds working
 * WITH DOCKER and docker compose examples Test for docker compose
 
 # Doesn't Handle
 
 This doesn't handle so many things. All are possible to overcome with enough examples and enough context tokens.
-
-* matrix builds
-* multi-lang monorepos ( try running separately for each one instead)
-* repos with out github action workflows
