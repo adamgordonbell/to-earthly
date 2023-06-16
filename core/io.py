@@ -4,18 +4,20 @@ from pprint import pprint
 from textwrap import dedent
 from joblib import Memory
 from dotenv import load_dotenv
+from collections import defaultdict
 import openai
 import time
 import os
 import subprocess
 import glob
+import core.boot
+from typing import Tuple
 
 memory = Memory(location='data/gpt_cache', verbose=1)
 
-load_dotenv()
 openai.api_key = os.getenv('OPENAI_API_KEY')
 
-@memory.cache
+# @memory.cache
 def call_chat_completion_api_cached(max_tokens, messages,temperature):
     print("running prompt")
     return call_chat_completion_api(max_tokens,messages, temperature)
@@ -51,11 +53,24 @@ def read(filepath: str) -> str:
     with open(filepath, 'r') as outfile:
         return outfile.read()
 
+def relative_read(relative_filepath: str) -> str:
+    # Get the directory of the current script file
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+
+    # Construct the full filepath, by going up one folder
+    full_filepath = os.path.join(script_dir, ".." ,relative_filepath)
+
+    with open(full_filepath, 'r') as outfile:
+        return outfile.read()
+
 def write(contents: str, filepath: str) -> None:
+    directory = os.path.dirname(filepath)
+    if directory:
+        os.makedirs(directory, exist_ok=True)
     with open(filepath, 'w') as outfile:
         outfile.write(contents)
 
-def find_first_yml(path=None) -> str:
+def find_first_yml(path=None) -> Tuple[str,str]:
     if path is None:
         path = os.getcwd()
         
@@ -65,10 +80,10 @@ def find_first_yml(path=None) -> str:
     yml_files = glob.glob(path + ".github/workflows/*.yml")
 
     if not yml_files:
-        raise Exception("No yml files found.")
+        raise Exception("No yml files found. Process will stop.")
 
     with open(yml_files[0], 'r') as file:
-        return file.read()
+        return (file.read(),yml_files[0])
     
 
 def find_first_dockerfile(path=None) -> str:
@@ -86,17 +101,39 @@ def find_first_dockerfile(path=None) -> str:
     with open(docker_files[0], 'r') as file:
         return file.read()
 
+# Like tree but less output
+def print_directory(path, prefix='', level=0, max_level=1) -> str:
+    if level > max_level:
+        return ''
 
-def run_tree(path=None, level=2) -> str:
-    initial_directory = os.getcwd()
-    if path is None:
-        path = initial_directory
+    dir_structure = ''
+    dir_items = defaultdict(list)
 
-    os.chdir(path)
-    result = subprocess.run(["tree", "-F", "-L", str(level), "--noreport", '.'], capture_output=True, text=True)
-    os.chdir(initial_directory)
+    # Group files by extension and directories separately
+    for item in os.listdir(path):
+        # Ignore hidden files and directories
+        if item.startswith('.'):
+            continue
 
-    if result.returncode != 0:
-        raise Exception(f"Failed to run tree command: {result.stderr}")
+        if os.path.isfile(os.path.join(path, item)):
+            ext = os.path.splitext(item)[1]
+            dir_items[ext].append(item)
+        else:
+            dir_items['folders'].append(item)
 
-    return result.stdout
+    # Generate directory structure, combining files with same extension if more than 3
+    for ext, items in dir_items.items():
+        if ext != 'folders':
+            if len(items) > 3:
+                dir_structure += f"{prefix}├── *{ext}\n"
+            else:
+                for item in items:
+                    dir_structure += f"{prefix}├── {item}\n"
+        else:
+            for item in items:
+                dir_structure += f"{prefix}├── {item}/\n"
+                if level < max_level:
+                    subdir_structure = print_directory(os.path.join(path, item), prefix + "│   ", level + 1, max_level)
+                    dir_structure += subdir_structure
+
+    return dir_structure

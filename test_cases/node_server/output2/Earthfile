@@ -1,0 +1,20 @@
+VERSION 0.7
+FROM node:19
+WORKDIR /app
+
+deps:
+  COPY package*.json ./
+  RUN npm ci
+  COPY src/ src/
+  COPY quotes.txt .
+
+build:
+  FROM +deps
+  RUN npm install
+
+test:
+  FROM +build
+  RUN npm test
+
+all:
+  BUILD +test

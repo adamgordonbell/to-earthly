@@ -1,0 +1,10 @@
+#!/bin/bash
+
+# Get the current working directory
+current_dir=$(pwd)
+
+# Define the output directory
+output_dir="$current_dir/.to_earthly/"
+
+# Call the Python script with the current directory and output directory as arguments
+python /Users/adam/sandbox/to-earthly/scripts/run.py --input_dir "$current_dir" --output_dir "$output_dir" --earthfile "$current_dir"/Earthfile

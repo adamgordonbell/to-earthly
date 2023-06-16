@@ -10,12 +10,15 @@ from core import io, prompts
 # inputfolder: str = 'test_cases/react_simple/input'
 # outputfolder: str = 'test_cases/react_simple/output'
 
-inputfolder: str = 'test_cases/docker_simple/input'
-outputfolder: str = 'test_cases/docker_simple/output'
+inputfolder: str = 'test_cases/node_server/input'
+outputfolder: str = 'test_cases/node_server/output'
+
+# inputfolder: str = 'test_cases/docker_simple/input'
+# outputfolder: str = 'test_cases/docker_simple/output'
 
 def main() -> None:
     yml = io.find_first_yml(inputfolder)
-    file_structure = io.run_tree(inputfolder)
+    file_structure = io.print_directory(inputfolder)
     io.write(file_structure,f"{outputfolder}/files.txt")
 
     summarize : str = prompts.summarize_gha(yml)
