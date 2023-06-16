@@ -16,13 +16,13 @@ import core.boot
 
 gpt4 = guidance.llms.OpenAI("gpt-4")
 
-input1 = io.relative_read("test_cases/python_lint/training/workflow.yml")
-cot1 = io.relative_read("test_cases/python_lint/training/gha_to_bash_prompt_plan.md")
-result1 = io.relative_read("test_cases/python_lint/training/gha_to_bash_prompt_result.md")
+input1 = io.relative_read("data/python_lint/workflow.yml")
+cot1 = io.relative_read("data/python_lint/gha_to_bash_prompt_plan.md")
+result1 = io.relative_read("data/python_lint/gha_to_bash_prompt_result.md")
 
-input2 = io.relative_read("test_cases/docker_simple/training/workflow.yml")
-cot2 = io.relative_read("test_cases/docker_simple/training/gha_to_bash_prompt_plan.md")
-result2 = io.relative_read("test_cases/docker_simple/training/gha_to_bash_prompt_result.md")
+input2 = io.relative_read("data/docker_simple/workflow.yml")
+cot2 = io.relative_read("data/docker_simple/gha_to_bash_prompt_plan.md")
+result2 = io.relative_read("data/docker_simple/gha_to_bash_prompt_result.md")
 
 # Seems like we should pass in file structure as well?
 def prompt1(gha : str, files: str) -> Tuple[str, str, str, str, str]:
@@ -119,9 +119,9 @@ earthly_basics = io.relative_read("data/earthly_docs/basics.md")
 earthly_reference = io.relative_read("data/earthly_docs/summary.md") 
 earthly_tips = io.relative_read("data/earthly_docs/tips.md") 
 
-input1 = io.relative_read("test_cases/python_lint/training/files.md")
-cot1 = io.relative_read("test_cases/python_lint/training/EarthfilePlan.md")
-result1 = io.relative_read("test_cases/python_lint/training/Earthfile")
+input1 = io.relative_read("data/python_lint/files.md")
+cot1 = io.relative_read("data/python_lint/EarthfilePlan.md")
+result1 = io.relative_read("data/python_lint/Earthfile")
 
 def prompt2(files: str, run : str, docker : str, build : str) ->  Tuple[str,str]:
     identify = guidance(dedent('''
