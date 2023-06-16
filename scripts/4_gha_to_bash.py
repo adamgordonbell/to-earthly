@@ -23,7 +23,7 @@ outputfolder: str = 'test_cases/python_lint/output2/'
 def main() -> None:
     print("Gathering Data")
     yml = io.find_first_yml(inputfolder)
-    file_structure = io.run_tree(inputfolder)
+    file_structure = io.print_directory(inputfolder)
     io.write(file_structure,outputfolder + "files.txt")
 
     print("Running Stage 1")

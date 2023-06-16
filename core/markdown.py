@@ -1,7 +1,6 @@
 from typing import List
 
 def extract_code_blocks(markdown: str) -> List[str]:
-    print(markdown)
     in_code_block = False
     code_blocks = []
     current_block = []

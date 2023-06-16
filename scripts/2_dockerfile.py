@@ -14,7 +14,7 @@ def main() -> None:
   
     summarize : str = prompts.summarize_gha(yml)
 
-    filestructure = io.run_tree(inputfolder)
+    filestructure = io.print_directory(inputfolder)
     extra_docker_file = io.find_first_dockerfile(inputfolder)
     result = prompts.create_dockerfile(filestructure, summarize, extra_docker_file)
     print("Result:\n\n")

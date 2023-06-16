@@ -11,6 +11,7 @@ import os
 import subprocess
 import glob
 import core.boot
+from typing import Tuple
 
 memory = Memory(location='data/gpt_cache', verbose=1)
 
@@ -69,7 +70,7 @@ def write(contents: str, filepath: str) -> None:
     with open(filepath, 'w') as outfile:
         outfile.write(contents)
 
-def find_first_yml(path=None) -> str:
+def find_first_yml(path=None) -> Tuple[str,str]:
     if path is None:
         path = os.getcwd()
         
@@ -82,7 +83,7 @@ def find_first_yml(path=None) -> str:
         raise Exception("No yml files found. Process will stop.")
 
     with open(yml_files[0], 'r') as file:
-        return file.read()
+        return (file.read(),yml_files[0])
     
 
 def find_first_dockerfile(path=None) -> str:
@@ -99,21 +100,6 @@ def find_first_dockerfile(path=None) -> str:
 
     with open(docker_files[0], 'r') as file:
         return file.read()
-
-
-def run_tree(path=None, level=2) -> str:
-    initial_directory = os.getcwd()
-    if path is None:
-        path = initial_directory
-
-    os.chdir(path)
-    result = subprocess.run(["tree", "-F", "-L", str(level), "--noreport", '.'], capture_output=True, text=True)
-    os.chdir(initial_directory)
-
-    if result.returncode != 0:
-        raise Exception(f"Failed to run tree command: {result.stderr}")
-
-    return result.stdout
 
 # Like tree but less output
 def print_directory(path, prefix='', level=0, max_level=1) -> str:

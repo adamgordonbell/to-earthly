@@ -18,7 +18,7 @@ outputfolder: str = 'test_cases/node_server/output'
 
 def main() -> None:
     yml = io.find_first_yml(inputfolder)
-    file_structure = io.run_tree(inputfolder)
+    file_structure = io.print_directory(inputfolder)
     io.write(file_structure,f"{outputfolder}/files.txt")
 
     summarize : str = prompts.summarize_gha(yml)

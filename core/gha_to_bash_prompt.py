@@ -7,18 +7,13 @@ import time
 import dotenv 
 import requests
 from io import StringIO
-
-
+import contextlib
 from core import io, markdown
 import os
 import guidance
 from typing import Tuple
 import core.boot
 
-
-
-
-# dotenv.load_dotenv()
 gpt4 = guidance.llms.OpenAI("gpt-4")
 
 input1 = io.relative_read("test_cases/python_lint/training/workflow.yml")
@@ -113,11 +108,9 @@ def prompt1(gha : str, files: str) -> Tuple[str, str, str, str, str]:
         {{~/assistant}}
 
     '''), llm=gpt4)
-    out = identify(gha=dedent(gha), files=files, input1=input1, cot1=cot1, result1=result1, input2=input2, cot2=cot2, result2=result2)
-    print(out["discuss"])
+    with open(os.devnull, 'w') as f, contextlib.redirect_stdout(f):
+        out = identify(gha=dedent(gha), files=files, input1=input1, cot1=cot1, result1=result1, input2=input2, cot2=cot2, result2=result2)
     results = markdown.extract_code_blocks(out["files"])
-    # results = extract_code_blocks(out["files"])
-    print(results)
     if len(results) != 3:
         raise ValueError(f"3 Files exepected back. Instead got {len(results)}")
     return (out["discuss"],out["files"], results[0], results[1], results[2])
@@ -193,7 +186,8 @@ def prompt2(files: str, run : str, docker : str, build : str) ->  Tuple[str,str]
         {{~/assistant}}
 
     '''), llm=gpt4)
-    out = identify(earthly_basics=earthly_basics, input1=input1, cot1=cot1, result1=result1, files=files, run=run,docker=docker, build=build)
+    with open(os.devnull, 'w') as f, contextlib.redirect_stdout(f):
+        out = identify(earthly_basics=earthly_basics, input1=input1, cot1=cot1, result1=result1, files=files, run=run,docker=docker, build=build)
     results = markdown.extract_code_blocks(out["Earthfile"])
 
     # if len(results) != 1:
@@ -248,7 +242,8 @@ def prompt3(earthfile: str, gha : str, files: str) ->  Tuple[str,str]:
         {{~/assistant}}
 
     '''), llm=gpt4)
-    out = identify(earthly_basics=earthly_basics, 
+    with open(os.devnull, 'w') as f, contextlib.redirect_stdout(f):
+        out = identify(earthly_basics=earthly_basics, 
                    earthly_tips=earthly_tips, 
                    input1=input1, 
                    files=files, 
