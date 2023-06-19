@@ -1,7 +1,0 @@
-.
-├── Earthfile
-├── requirements.txt
-└── src/
-    ├── __pycache__/
-    ├── hello.py
-    └── hello_test.py
