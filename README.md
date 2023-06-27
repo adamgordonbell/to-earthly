@@ -7,7 +7,7 @@ docker run --rm -it --name my_container -v $(pwd):/input agbell/to-earthly
 ```
 
 
-## Run
+## Run using your own OpenAI key
 
 Give OpenAI KEY:
 ```
