@@ -7,8 +7,7 @@ try:
     dotenv.load_dotenv()
     cipher = AES.new(os.getenv('TO_EARTHLY_AST')[:32].encode(), AES.MODE_ECB)
     script_dir = os.path.dirname(os.path.abspath(__file__))
-    full_filepath = os.path.join(script_dir, "..", "/data/data")
-
+    full_filepath = f"{script_dir}/../data/data"
     with open(full_filepath, 'r') as file:
         encrypted_code = file.read()
 
