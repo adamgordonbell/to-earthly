@@ -11,9 +11,8 @@ deps:
 
 docker:
   FROM +deps
-  COPY --dir core data scripts test_cases util .
+  COPY --dir core data scripts util .
   COPY __init__.py .
-  # COPY .env .
   ENV PYTHONPATH=/app:$PYTHONPATH
   CMD ["python", "./scripts/run.py", "--input_dir", "/input", "--output_dir", "/input/.to_earthly/", "--earthfile", "/input/Earthfile"]
   SAVE IMAGE --push agbell/to-earthly
