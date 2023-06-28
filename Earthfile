@@ -11,8 +11,7 @@ deps:
 
 docker:
   FROM +deps
-  COPY --dir core data scripts util .
-  COPY __init__.py .
+  COPY --dir toearthly .
   ENV PYTHONPATH=/app:$PYTHONPATH
-  CMD ["python", "./scripts/run.py", "--input_dir", "/input", "--output_dir", "/input/.to_earthly/", "--earthfile", "/input/Earthfile"]
+  CMD ["python", "/app/toearthly/scripts/run.py", "--input_dir", "/input", "--output_dir", "/input/.to_earthly/", "--earthfile", "/input/Earthfile"]
   SAVE IMAGE to-earthly
