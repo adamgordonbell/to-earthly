@@ -2,8 +2,8 @@ from typing import List
 
 def extract_code_blocks(markdown: str) -> List[str]:
     in_code_block = False
-    code_blocks = []
-    current_block = []
+    code_blocks : List[str] = []
+    current_block : List[str] = []
 
     lines = markdown.split('\n')
     for line in lines:

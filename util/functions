@@ -1,4 +1,8 @@
 #! /bin/bash
 # shellcheck disable=SC2207 # Arrays are a pain in bash 3
 
+# Source this file, and get some functions to run at project root.
+
 export PYTHONPATH=/Users/adam/sandbox/to-earthly:$PYTHONPATH
+
+

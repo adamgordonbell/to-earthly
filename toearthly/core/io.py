@@ -1,16 +1,9 @@
-from typing import Callable, List, Optional
-from pprint import pprint
-from pprint import pprint
-from textwrap import dedent
 from joblib import Memory
-from dotenv import load_dotenv
 from collections import defaultdict
 import openai
 import time
 import os
-import subprocess
 import glob
-import core.boot
 from typing import Tuple
 
 memory = Memory(location='data/gpt_cache', verbose=1)
@@ -133,7 +126,10 @@ def print_directory(path, prefix='', level=0, max_level=1) -> str:
             for item in items:
                 dir_structure += f"{prefix}├── {item}/\n"
                 if level < max_level:
-                    subdir_structure = print_directory(os.path.join(path, item), prefix + "│   ", level + 1, max_level)
+                    subdir_structure = print_directory(os.path.join(path, item),
+                                                       prefix + "│   ",
+                                                       level + 1, 
+                                                       max_level)
                     dir_structure += subdir_structure
 
     return dir_structure
