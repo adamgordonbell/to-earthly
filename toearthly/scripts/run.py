@@ -6,7 +6,7 @@ from toearthly.core import io, gha_to_bash_prompt
 # Default directories
 DEFAULT_INPUT_DIR = '/input/'
 DEFAULT_EARTHFILE_PATH = '/input/Earthfile'
-DEFAULT_OUTPUT_DIR = '/input/.to_earthly/'
+DEFAULT_DEBUG_DIR = '/input/.to_earthly/'
 
 
 intro = """
@@ -35,7 +35,7 @@ I'll prioritize these based on feedback. So reach out on slack or via adam@earth
 or via https://github.com/adamgordonbell/to-earthly
 """
 
-def main(input_dir: str, earthfile_path : str, output_dir: str) -> None:
+def main(input_dir: str, earthfile_path : str, debug_dir: str) -> None:
     print(intro)
     input("Press Enter to continue...")
     yml,path = io.find_first_yml(input_dir)
@@ -47,20 +47,20 @@ def main(input_dir: str, earthfile_path : str, output_dir: str) -> None:
           """))
     file_structure = io.print_directory(input_dir)
     extra_docker_file = io.find_first_dockerfile(input_dir)
-    io.write(yml,output_dir + "workflow.yml")
-    io.write(file_structure,output_dir + "files.txt")
-    io.write(extra_docker_file,output_dir + "Dockerfile")
+    io.write(yml,debug_dir + "workflow.yml")
+    io.write(file_structure,debug_dir + "files.txt")
+    io.write(extra_docker_file,debug_dir + "Dockerfile")
 
     print("Starting...\n (This may take 10 minutes)")
     print("Running Stage 1")
     discuss1, result, runfile, dockerfile, buildfile = gha_to_bash_prompt.prompt1(
         yml, 
         file_structure)
-    io.write(discuss1, output_dir + "gha_to_bash_prompt_plan.md")
-    io.write(result, output_dir + "gha_to_bash_prompt_result.md")
-    io.write(runfile, output_dir + "run.sh")
-    io.write(dockerfile, output_dir + "build.Dockerfile")
-    io.write(buildfile, output_dir + "build.sh")
+    io.write(discuss1, debug_dir + "gha_to_bash_prompt_plan.md")
+    io.write(result, debug_dir + "gha_to_bash_prompt_result.md")
+    io.write(runfile, debug_dir + "run.sh")
+    io.write(dockerfile, debug_dir + "build.Dockerfile")
+    io.write(buildfile, debug_dir + "build.sh")
 
     print("Running Stage 2")
     discuss, earthfile = gha_to_bash_prompt.prompt2(
@@ -68,12 +68,12 @@ def main(input_dir: str, earthfile_path : str, output_dir: str) -> None:
         runfile,
         dockerfile, 
         buildfile)
-    io.write(discuss, output_dir + "EarthfilePlan.md")
-    io.write(earthfile, output_dir + "Earthfile.1")
+    io.write(discuss, debug_dir + "EarthfilePlan.md")
+    io.write(earthfile, debug_dir + "Earthfile.1")
 
     print("Running Stage 3")
     discuss, earthfile = gha_to_bash_prompt.prompt3(earthfile, yml, file_structure)
-    io.write(discuss, output_dir + "EarthfileFixPlan.md")
+    io.write(discuss, debug_dir + "EarthfileFixPlan.md")
     io.write(earthfile, earthfile_path)
 
 if __name__ == '__main__':
@@ -82,8 +82,8 @@ if __name__ == '__main__':
                         default=DEFAULT_INPUT_DIR)
     parser.add_argument("--earthfile", help="Earthfile path", 
                         default=DEFAULT_EARTHFILE_PATH)
-    parser.add_argument("--output_dir", help="Output directory location", 
-                        default=DEFAULT_OUTPUT_DIR)
+    parser.add_argument("--debug_dir", help="Debug directory location", 
+                        default=DEFAULT_DEBUG_DIR)
     args = parser.parse_args()
 
-    main(args.input_dir, args.earthfile, args.output_dir)
+    main(args.input_dir, args.earthfile, args.debug_dir)
