@@ -15,8 +15,12 @@ input2 = io.relative_read("data/docker_simple/workflow.yml")
 cot2 = io.relative_read("data/docker_simple/gha_to_bash_prompt_plan.md")
 result2 = io.relative_read("data/docker_simple/gha_to_bash_prompt_result.md")
 
+def call_identify(identify, *args, **kwargs):
+        with open(io.DEBUG_DIR + "log.txt", 'a') as f, contextlib.redirect_stdout(f):
+            return identify(*args, **kwargs)
+
 # Seems like we should pass in file structure as well?
-def prompt1(gha : str, files: str) -> Tuple[str, str, str, str, str]:
+def prompt1(gha : str, files: str) -> Tuple[str, str, str]:
  
     identify = guidance(dedent('''
     {{#system~}}
@@ -128,20 +132,25 @@ def prompt1(gha : str, files: str) -> Tuple[str, str, str, str, str]:
     {{gen "files" temperature=0 max_tokens=500}}
     {{~/assistant}}
     '''), llm=gpt4)
-    with open(os.devnull, 'w') as f, contextlib.redirect_stdout(f):
-        out = identify(
-            gha=dedent(gha), 
-            files=files, 
-            input1=input1, 
-            cot1=cot1, 
-            result1=result1, 
-            input2=input2, 
-            cot2=cot2, 
-            result2=result2)
+    
+    out = call_identify(identify,
+        gha=dedent(gha), 
+        files=files, 
+        input1=input1, 
+        cot1=cot1, 
+        result1=result1, 
+        input2=input2, 
+        cot2=cot2, 
+        result2=result2)
+    io.write_debug("gha_to_bash_prompt_plan.md", out["discuss"])
+    io.write_debug("gha_to_bash_prompt_result.md", out["files"])
     results = markdown.extract_code_blocks(out["files"])
     if len(results) != 3:
         raise ValueError(f"3 Files exepected back. Instead got {len(results)}")
-    return (out["discuss"],out["files"], results[0], results[1], results[2])
+    io.write_debug("run.sh", results[0])
+    io.write_debug("build.Dockerfile", results[1])
+    io.write_debug("build.sh", results[2])
+    return (results[0],results[1], results[2])
 
 earthly_basics = io.relative_read("data/earthly_docs/basics.md") 
 earthly_reference = io.relative_read("data/earthly_docs/summary.md") 
@@ -151,7 +160,7 @@ input1 = io.relative_read("data/python_lint/files.md")
 cot1 = io.relative_read("data/python_lint/EarthfilePlan.md")
 result1 = io.relative_read("data/python_lint/Earthfile")
 
-def prompt2(files: str, run : str, docker : str, build : str) ->  Tuple[str,str]:
+def prompt2(files: str, run : str, docker : str, build : str) -> str:
     identify = guidance(dedent('''
     {{#system~}}
     You are creating an Earthfile from several bash and dockerfiles. I'll share Earthly 
@@ -224,8 +233,7 @@ def prompt2(files: str, run : str, docker : str, build : str) ->  Tuple[str,str]
     {{gen "Earthfile" temperature=0 max_tokens=2000}}
     {{~/assistant}}
     '''), llm=gpt4)
-    with open(os.devnull, 'w') as f, contextlib.redirect_stdout(f):
-        out = identify(earthly_basics=earthly_basics, 
+    out = call_identify(identify, earthly_basics=earthly_basics, 
                        input1=input1, 
                        cot1=cot1, 
                        result1=result1, 
@@ -235,11 +243,14 @@ def prompt2(files: str, run : str, docker : str, build : str) ->  Tuple[str,str]
                        build=build)
     results = markdown.extract_code_blocks(out["Earthfile"])
 
-    # if len(results) != 1:
-        # raise ValueError(f"1 Files exepected back. Instead got {len(results)}.")
-    return (out["discuss"],results[0])
+    if len(results) != 1:
+        raise ValueError(f"1 Files exepected back. Instead got {len(results)}.")
+    io.write_debug("EarthfilePlan.md", out["discuss"])
+    earthfile = results[0]
+    io.write_debug("Earthfile.1",earthfile)
+    return earthfile
 
-def prompt3(earthfile: str, gha : str, files: str) ->  Tuple[str,str]:
+def prompt3(earthfile: str, gha : str, files: str) ->  str:
     identify = guidance(dedent('''
         {{#system~}}
         Use the below documentation on Earthfiles to do a code conversion task.
@@ -294,15 +305,15 @@ def prompt3(earthfile: str, gha : str, files: str) ->  Tuple[str,str]:
         {{~/assistant}}
 
     '''), llm=gpt4)
-    with open(os.devnull, 'w') as f, contextlib.redirect_stdout(f):
-        out = identify(earthly_basics=earthly_basics, 
+    out = call_identify(identify,
+                   earthly_basics=earthly_basics, 
                    earthly_tips=earthly_tips, 
                    input1=input1, 
                    files=files, 
                    gha=gha,
                    earthfile=earthfile)
+    io.write_debug("EarthfileFixPlan.md", out["discuss"])
     results = markdown.extract_code_blocks(out["Earthfile"])
-
-    # if len(results) != 1:
-        # raise ValueError(f"1 Files exepected back. Instead got {len(results)}.")
-    return (out["discuss"],results[0])
+    if len(results) != 1:
+        raise ValueError(f"1 Files exepected back. Instead got {len(results)}.")
+    return results[0]

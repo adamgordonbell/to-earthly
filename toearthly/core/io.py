@@ -63,6 +63,13 @@ def write(contents: str, filepath: str) -> None:
     with open(filepath, 'w') as outfile:
         outfile.write(contents)
 
+DEBUG_DIR = '/input/.to_earthly/'
+
+def write_debug(filename: str, contents: str) -> None:
+    filepath = os.path.join(DEBUG_DIR, filename)
+    with open(filepath, 'w') as outfile:
+        outfile.write(contents)
+
 def find_first_yml(path=None) -> Tuple[str,str]:
     if path is None:
         path = os.getcwd()
@@ -76,7 +83,9 @@ def find_first_yml(path=None) -> Tuple[str,str]:
         raise Exception("No yml files found. Process will stop.")
 
     with open(yml_files[0], 'r') as file:
-        return (file.read(),yml_files[0])
+        yml = file.read()
+    write_debug("workflow.yml", yml)
+    return (yml,yml_files[0])
     
 
 def find_first_dockerfile(path=None) -> str:
@@ -92,7 +101,10 @@ def find_first_dockerfile(path=None) -> str:
         return ""
 
     with open(docker_files[0], 'r') as file:
-        return file.read()
+        dockerfile = file.read()
+    write_debug("Dockerfile", dockerfile)
+    return dockerfile
+
 
 # Like tree but less output
 def print_directory(path, prefix='', level=0, max_level=1) -> str:
@@ -131,5 +143,5 @@ def print_directory(path, prefix='', level=0, max_level=1) -> str:
                                                        level + 1, 
                                                        max_level)
                     dir_structure += subdir_structure
-
+    write_debug("files.txt", dir_structure)
     return dir_structure
