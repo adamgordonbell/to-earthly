@@ -35,7 +35,7 @@ I'll prioritize these based on feedback. So reach out on slack or via adam@earth
 or via https://github.com/adamgordonbell/to-earthly
 """
 
-def main(input_dir: str, earthfile_path : str, debug_dir: str) -> None:
+def main(input_dir: str, earthfile_path : str) -> None:
     print(intro)
     input("Press Enter to continue...")
     yml,path = io.find_first_yml(input_dir)
@@ -43,13 +43,13 @@ def main(input_dir: str, earthfile_path : str, debug_dir: str) -> None:
           Input:
           Workflow:\t{path}
           Output:\t\t{earthfile_path}
-          Debug files:\t{debug_dir}
+          Debug files:\t{io.DEBUG_DIR}
           """))
     file_structure = io.print_directory(input_dir)
     extra_docker_file = io.find_first_dockerfile(input_dir)
-    io.write(yml,debug_dir + "workflow.yml")
-    io.write(file_structure,debug_dir + "files.txt")
-    io.write(extra_docker_file,debug_dir + "Dockerfile")
+    io.write(yml, io.DEBUG_DIR + "workflow.yml")
+    io.write(file_structure, io.DEBUG_DIR + "files.txt")
+    io.write(extra_docker_file, io.DEBUG_DIR + "Dockerfile")
 
     print("Starting...\n (This may take 10 minutes)")
     print("Running Stage 1")
@@ -77,4 +77,6 @@ if __name__ == '__main__':
                         default=DEFAULT_DEBUG_DIR)
     args = parser.parse_args()
 
-    main(args.input_dir, args.earthfile, args.debug_dir)
+    io.DEBUG_DIR = args.debug_dir
+
+    main(args.input_dir, args.earthfile)
