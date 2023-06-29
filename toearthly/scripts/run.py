@@ -49,7 +49,7 @@ def select_workflow(input_dir : str) -> Tuple[str,str]:
         answers = inquirer.prompt(questions)
         path = answers['option']
     else:
-        yml = ymls[0]
+        path = ymls[0]
     with open(path, 'r') as file:
         yml = file.read()
     return (path, yml)
