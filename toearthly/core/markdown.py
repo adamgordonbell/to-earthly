@@ -9,7 +9,8 @@ def extract_code_blocks(markdown: str) -> List[str]:
     for line in lines:
         if line.strip().startswith('```'):
             if in_code_block:  # End of a block
-                code_blocks.append('\n'.join(current_block))
+                if len(current_block) > 2:
+                    code_blocks.append('\n'.join(current_block))
                 current_block = []
             in_code_block = not in_code_block
         elif in_code_block:  # Inside a block
