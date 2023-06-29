@@ -54,33 +54,39 @@ def select_workflow(input_dir : str) -> Tuple[str,str]:
         yml = file.read()
     return (path, yml)
 
+import openai
+
 def main(input_dir: str, earthfile_path : str) -> None:
-    print(intro)
-    path, yml = select_workflow(input_dir)
+    try:
+        print(intro)
+        path, yml = select_workflow(input_dir)
 
-    print(dedent(f"""
-          Input:
-          Workflow:\t{path}
-          Output:\t\t{earthfile_path}
-          Debug files:\t{constants.DEBUG_DIR}
-          """))
-    file_structure = io.print_directory(input_dir)
-    extra_docker_file = io.find_first_dockerfile(input_dir)
+        print(dedent(f"""
+              Input:
+              Workflow:\t{path}
+              Output:\t\t{earthfile_path}
+              Debug files:\t{constants.DEBUG_DIR}
+              """))
+        file_structure = io.print_directory(input_dir)
+        extra_docker_file = io.find_first_dockerfile(input_dir)
 
-    print("Starting...\n (This may take 10 minutes)")
-    print("Running Stage 1")
-    runfile, dockerfile, buildfile = gha_to_bash_prompt.prompt1(yml, file_structure)
+        print("Starting...\n (This may take 10 minutes)")
+        print("Running Stage 1")
+        runfile, dockerfile, buildfile = gha_to_bash_prompt.prompt1(yml, file_structure)
 
-    print("Running Stage 2")
-    earthfile = gha_to_bash_prompt.prompt2(
-        file_structure, 
-        runfile,
-        dockerfile, 
-        buildfile)
+        print("Running Stage 2")
+        earthfile = gha_to_bash_prompt.prompt2(
+            file_structure, 
+            runfile,
+            dockerfile, 
+            buildfile)
 
-    print("Running Stage 3")
-    earthfile = gha_to_bash_prompt.prompt3(earthfile, yml, file_structure)
-    io.write(constants.EARTHLY_WARNING + earthfile, earthfile_path)
+        print("Running Stage 3")
+        earthfile = gha_to_bash_prompt.prompt3(earthfile, yml, file_structure)
+        io.write(constants.EARTHLY_WARNING + earthfile, earthfile_path)
+    except openai.error.InvalidRequestError as e:
+        print("We were unable to convert this workflow.")
+        print(f"Error details: {e}")
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
