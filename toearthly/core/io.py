@@ -56,12 +56,17 @@ def relative_read(relative_filepath: str) -> str:
     with open(full_filepath, 'r') as outfile:
         return outfile.read()
 
-def write(contents: str, filepath: str) -> None:
-    directory = os.path.dirname(filepath)
-    if directory:
-        os.makedirs(directory, exist_ok=True)
-    with open(filepath, 'w') as outfile:
-        outfile.write(contents)
+class DebugIO:
+    def __init__(self, debug_dir: str):
+        self.debug_dir = debug_dir
+
+    def write(self, contents: str, filepath: str) -> None:
+        full_path = os.path.join(self.debug_dir, filepath)
+        directory = os.path.dirname(full_path)
+        if directory:
+            os.makedirs(directory, exist_ok=True)
+        with open(full_path, 'w') as outfile:
+            outfile.write(contents)
 
 def find_first_yml(path=None) -> Tuple[str,str]:
     if path is None:

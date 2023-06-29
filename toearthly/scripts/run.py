@@ -47,9 +47,10 @@ def main(input_dir: str, earthfile_path : str, debug_dir: str) -> None:
           """))
     file_structure = io.print_directory(input_dir)
     extra_docker_file = io.find_first_dockerfile(input_dir)
-    io.write(yml,debug_dir + "workflow.yml")
-    io.write(file_structure,debug_dir + "files.txt")
-    io.write(extra_docker_file,debug_dir + "Dockerfile")
+    debug_io = DebugIO(debug_dir)
+    debug_io.write(yml, "workflow.yml")
+    debug_io.write(file_structure, "files.txt")
+    debug_io.write(extra_docker_file, "Dockerfile")
 
     print("Starting...\n (This may take 10 minutes)")
     print("Running Stage 1")
