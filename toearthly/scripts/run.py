@@ -35,11 +35,7 @@ I'll prioritize these based on feedback. So reach out on slack or via adam@earth
 or via https://github.com/adamgordonbell/to-earthly
 """
 
-debug_dir = None
-
-def main(input_dir: str, earthfile_path : str, debug_dir_arg: str) -> None:
-    global debug_dir
-    debug_dir = debug_dir_arg
+def main(input_dir: str, earthfile_path : str, debug_dir: str) -> None:
     print(intro)
     input("Press Enter to continue...")
     yml,path = io.find_first_yml(input_dir)

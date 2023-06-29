@@ -56,10 +56,12 @@ def relative_read(relative_filepath: str) -> str:
     with open(full_filepath, 'r') as outfile:
         return outfile.read()
 
-from toearthly.scripts.run import debug_dir
+class DebugIO:
+    def __init__(self, debug_dir: str):
+        self.debug_dir = debug_dir
 
-def write(contents: str, filepath: str) -> None:
-    full_path = os.path.join(debug_dir, filepath)
+    def write(self, contents: str, filepath: str) -> None:
+        full_path = os.path.join(self.debug_dir, filepath)
         directory = os.path.dirname(full_path)
         if directory:
             os.makedirs(directory, exist_ok=True)
