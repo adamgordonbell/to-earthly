@@ -1,6 +1,7 @@
+<!-- markdownlint-disable -->
 # to-earthly
 
-## Run from pre-built image
+## Run from Pre-Built Image
 
 ```
 docker run --rm -it --name my_container -v $(pwd):/input agbell/to-earthly

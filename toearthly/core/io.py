@@ -6,6 +6,7 @@ import os
 import glob
 from typing import Tuple
 
+
 memory = Memory(location='data/gpt_cache', verbose=1)
 
 openai.api_key = os.getenv('OPENAI_API_KEY')
@@ -63,6 +64,13 @@ def write(contents: str, filepath: str) -> None:
     with open(filepath, 'w') as outfile:
         outfile.write(contents)
 
+DEBUG_DIR = '/input/.to_earthly/'
+
+def write_debug(filename: str, contents: str) -> None:
+    filepath = os.path.join(DEBUG_DIR, filename)
+    with open(filepath, 'w') as outfile:
+        outfile.write(contents)
+
 def find_first_yml(path=None) -> Tuple[str,str]:
     if path is None:
         path = os.getcwd()
@@ -93,6 +101,7 @@ def find_first_dockerfile(path=None) -> str:
 
     with open(docker_files[0], 'r') as file:
         return file.read()
+
 
 # Like tree but less output
 def print_directory(path, prefix='', level=0, max_level=1) -> str:
