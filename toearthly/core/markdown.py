@@ -9,6 +9,8 @@ def extract_code_blocks(markdown: str) -> List[str]:
     for line in lines:
         if line.strip().startswith('```'):
             if in_code_block:  # End of a block
+                # Small blocks are usually just an description
+                # of how to run the code, and not actual code
                 if len(current_block) > 2:
                     code_blocks.append('\n'.join(current_block))
                 current_block = []
