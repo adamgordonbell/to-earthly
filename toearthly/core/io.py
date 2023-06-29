@@ -5,6 +5,7 @@ import time
 import os
 import glob
 from typing import Tuple, List
+from toearthly.core import constants
 
 memory = Memory(location='data/gpt_cache', verbose=1)
 
@@ -63,10 +64,9 @@ def write(contents: str, filepath: str) -> None:
     with open(filepath, 'w') as outfile:
         outfile.write(contents)
 
-from .constants import DEBUG_DIR
 
 def write_debug(filename: str, contents: str) -> None:
-    filepath = os.path.join(DEBUG_DIR, filename)
+    filepath = os.path.join(constants.DEBUG_DIR, filename)
     with open(filepath, 'w') as outfile:
         outfile.write(contents)
 

@@ -3,7 +3,7 @@ import argparse
 import inquirer
 from typing import Tuple
 
-from toearthly.core import io, gha_to_bash_prompt
+from toearthly.core import io, gha_to_bash_prompt, constants
 
 # Default directories
 DEFAULT_INPUT_DIR = '/input/'
@@ -62,7 +62,7 @@ def main(input_dir: str, earthfile_path : str) -> None:
           Input:
           Workflow:\t{path}
           Output:\t\t{earthfile_path}
-          Debug files:\t{io.DEBUG_DIR}
+          Debug files:\t{constants.DEBUG_DIR}
           """))
     file_structure = io.print_directory(input_dir)
     extra_docker_file = io.find_first_dockerfile(input_dir)
@@ -80,7 +80,7 @@ def main(input_dir: str, earthfile_path : str) -> None:
 
     print("Running Stage 3")
     earthfile = gha_to_bash_prompt.prompt3(earthfile, yml, file_structure)
-    io.write(earthfile, earthfile_path)
+    io.write(constants.EARTHLY_WARNING + earthfile, earthfile_path)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -92,6 +92,6 @@ if __name__ == '__main__':
                         default=DEFAULT_DEBUG_DIR)
     args = parser.parse_args()
 
-    io.DEBUG_DIR = args.debug_dir
+    constants.DEBUG_DIR = args.debug_dir
 
     main(args.input_dir, args.earthfile)
