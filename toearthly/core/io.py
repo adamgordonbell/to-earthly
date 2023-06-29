@@ -63,7 +63,7 @@ def write(contents: str, filepath: str) -> None:
     with open(filepath, 'w') as outfile:
         outfile.write(contents)
 
-DEBUG_DIR = '/input/.to_earthly/'
+from .constants import DEBUG_DIR
 
 def write_debug(filename: str, contents: str) -> None:
     filepath = os.path.join(DEBUG_DIR, filename)
