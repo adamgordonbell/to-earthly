@@ -87,6 +87,9 @@ def main(input_dir: str, earthfile_path : str) -> None:
     except openai.error.InvalidRequestError as e:
         print("We were unable to convert this workflow.")
         io.log(f"Error Type: openai.error.InvalidRequestError \n Error details: {e}")
+    except Exception as e:
+        print("An unexpected error occurred.")
+        io.log(f"Error Type: {type(e).__name__} \n Error details: {e}")
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
