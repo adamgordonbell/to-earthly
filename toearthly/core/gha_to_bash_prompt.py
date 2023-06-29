@@ -128,16 +128,19 @@ def prompt1(gha : str, files: str) -> Tuple[str, str, str]:
     {{gen "files" temperature=0 max_tokens=500}}
     {{~/assistant}}
     '''), llm=gpt4)
-    with open(io.DEBUG_DIR + "log.txt", 'a') as f, contextlib.redirect_stdout(f):
-        out = identify(
-            gha=dedent(gha), 
-            files=files, 
-            input1=input1, 
-            cot1=cot1, 
-            result1=result1, 
-            input2=input2, 
-            cot2=cot2, 
-            result2=result2)
+    def call_identify(*args, **kwargs):
+        with open(io.DEBUG_DIR + "log.txt", 'a') as f, contextlib.redirect_stdout(f):
+            return identify(*args, **kwargs)
+
+    out = call_identify(
+        gha=dedent(gha), 
+        files=files, 
+        input1=input1, 
+        cot1=cot1, 
+        result1=result1, 
+        input2=input2, 
+        cot2=cot2, 
+        result2=result2)
     io.write_debug("gha_to_bash_prompt_plan.md", out["discuss"])
     io.write_debug("gha_to_bash_prompt_result.md", out["files"])
     results = markdown.extract_code_blocks(out["files"])
