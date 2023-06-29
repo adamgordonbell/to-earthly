@@ -53,11 +53,10 @@ def main(input_dir: str, earthfile_path : str, debug_dir: str) -> None:
 
     print("Starting...\n (This may take 10 minutes)")
     print("Running Stage 1")
-    discuss1, result, runfile, dockerfile, buildfile = gha_to_bash_prompt.prompt1(
+    runfile, dockerfile, buildfile = gha_to_bash_prompt.prompt1(
         yml, 
-        file_structure)
-    io.write(discuss1, debug_dir + "gha_to_bash_prompt_plan.md")
-    io.write(result, debug_dir + "gha_to_bash_prompt_result.md")
+        file_structure,
+        debug_dir)
     io.write(runfile, debug_dir + "run.sh")
     io.write(dockerfile, debug_dir + "build.Dockerfile")
     io.write(buildfile, debug_dir + "build.sh")

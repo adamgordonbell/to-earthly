@@ -16,7 +16,7 @@ cot2 = io.relative_read("data/docker_simple/gha_to_bash_prompt_plan.md")
 result2 = io.relative_read("data/docker_simple/gha_to_bash_prompt_result.md")
 
 # Seems like we should pass in file structure as well?
-def prompt1(gha : str, files: str) -> Tuple[str, str, str, str, str]:
+def prompt1(gha : str, files: str, debug_dir: str) -> Tuple[str, str, str]:
  
     identify = guidance(dedent('''
     {{#system~}}
@@ -141,7 +141,9 @@ def prompt1(gha : str, files: str) -> Tuple[str, str, str, str, str]:
     results = markdown.extract_code_blocks(out["files"])
     if len(results) != 3:
         raise ValueError(f"3 Files exepected back. Instead got {len(results)}")
-    return (out["discuss"],out["files"], results[0], results[1], results[2])
+    io.write(out["discuss"], debug_dir + "gha_to_bash_prompt_plan.md")
+    io.write(out["files"], debug_dir + "gha_to_bash_prompt_result.md")
+    return (results[0], results[1], results[2])
 
 earthly_basics = io.relative_read("data/earthly_docs/basics.md") 
 earthly_reference = io.relative_read("data/earthly_docs/summary.md") 
