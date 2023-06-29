@@ -53,13 +53,7 @@ def main(input_dir: str, earthfile_path : str, debug_dir: str) -> None:
 
     print("Starting...\n (This may take 10 minutes)")
     print("Running Stage 1")
-    runfile, dockerfile, buildfile = gha_to_bash_prompt.prompt1(
-        yml, 
-        file_structure,
-        debug_dir)
-    io.write(runfile, debug_dir + "run.sh")
-    io.write(dockerfile, debug_dir + "build.Dockerfile")
-    io.write(buildfile, debug_dir + "build.sh")
+    runfile, dockerfile, buildfile = gha_to_bash_prompt.prompt1(yml, file_structure, debug_dir)
 
     print("Running Stage 2")
     earthfile = gha_to_bash_prompt.prompt2(

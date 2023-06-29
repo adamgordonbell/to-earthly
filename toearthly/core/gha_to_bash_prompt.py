@@ -143,7 +143,10 @@ def prompt1(gha : str, files: str, debug_dir: str) -> Tuple[str, str, str]:
     results = markdown.extract_code_blocks(out["files"])
     if len(results) != 3:
         raise ValueError(f"3 Files exepected back. Instead got {len(results)}")
-    return (results[0], results[1], results[2])
+    io.write(results[0], debug_dir + "run.sh")
+    io.write(results[1], debug_dir + "build.Dockerfile")
+    io.write(results[2], debug_dir + "build.sh")
+    return
 
 earthly_basics = io.relative_read("data/earthly_docs/basics.md") 
 earthly_reference = io.relative_read("data/earthly_docs/summary.md") 
