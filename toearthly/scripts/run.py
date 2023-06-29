@@ -71,8 +71,7 @@ def main(input_dir: str, earthfile_path : str, debug_dir: str) -> None:
     io.write(earthfile, debug_dir + "Earthfile.1")
 
     print("Running Stage 3")
-    discuss, earthfile = gha_to_bash_prompt.prompt3(earthfile, yml, file_structure, debug_dir)
-    io.write(discuss, debug_dir + "EarthfileFixPlan.md")
+    earthfile = gha_to_bash_prompt.prompt3(earthfile, yml, file_structure, debug_dir)
     io.write(earthfile, earthfile_path)
 
 if __name__ == '__main__':
