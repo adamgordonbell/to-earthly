@@ -237,8 +237,8 @@ def prompt2(files: str, run : str, docker : str, build : str, debug_dir: str) ->
                        build=build)
     results = markdown.extract_code_blocks(out["Earthfile"])
 
-    # if len(results) != 1:
-        # raise ValueError(f"1 Files exepected back. Instead got {len(results)}.")
+    if len(results) != 1:
+        raise ValueError(f"1 Files exepected back. Instead got {len(results)}.")
     return (out["discuss"],results[0])
 
 def prompt3(earthfile: str, gha : str, files: str, debug_dir: str) ->  Tuple[str,str]:
@@ -305,6 +305,6 @@ def prompt3(earthfile: str, gha : str, files: str, debug_dir: str) ->  Tuple[str
                    earthfile=earthfile)
     results = markdown.extract_code_blocks(out["Earthfile"])
 
-    # if len(results) != 1:
-        # raise ValueError(f"1 Files exepected back. Instead got {len(results)}.")
+    if len(results) != 1:
+        raise ValueError(f"1 Files exepected back. Instead got {len(results)}.")
     return (out["discuss"],results[0])
