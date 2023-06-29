@@ -47,7 +47,6 @@ def main(input_dir: str, earthfile_path : str) -> None:
           """))
     file_structure = io.print_directory(input_dir)
     extra_docker_file = io.find_first_dockerfile(input_dir)
-    
 
     print("Starting...\n (This may take 10 minutes)")
     print("Running Stage 1")
