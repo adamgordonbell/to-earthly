@@ -37,8 +37,9 @@ or via https://github.com/adamgordonbell/to-earthly
 
 def main(input_dir: str, earthfile_path : str) -> None:
     print(intro)
-    input("Press Enter to continue...")
     yml, path = io.find_first_yml(input_dir)
+
+    input("Press Enter to continue...")
     print(dedent(f"""
           Input:
           Workflow:\t{path}
@@ -53,7 +54,7 @@ def main(input_dir: str, earthfile_path : str) -> None:
     runfile, dockerfile, buildfile = gha_to_bash_prompt.prompt1(yml, file_structure)
 
     print("Running Stage 2")
-    gha_to_bash_prompt.prompt2(
+    earthfile = gha_to_bash_prompt.prompt2(
         file_structure, 
         runfile,
         dockerfile, 

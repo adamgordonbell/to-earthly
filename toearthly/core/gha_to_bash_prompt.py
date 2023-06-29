@@ -15,6 +15,10 @@ input2 = io.relative_read("data/docker_simple/workflow.yml")
 cot2 = io.relative_read("data/docker_simple/gha_to_bash_prompt_plan.md")
 result2 = io.relative_read("data/docker_simple/gha_to_bash_prompt_result.md")
 
+def call_identify(identify, *args, **kwargs):
+        with open(io.DEBUG_DIR + "log.txt", 'a') as f, contextlib.redirect_stdout(f):
+            return identify(*args, **kwargs)
+
 # Seems like we should pass in file structure as well?
 def prompt1(gha : str, files: str) -> Tuple[str, str, str]:
  
@@ -128,11 +132,8 @@ def prompt1(gha : str, files: str) -> Tuple[str, str, str]:
     {{gen "files" temperature=0 max_tokens=500}}
     {{~/assistant}}
     '''), llm=gpt4)
-    def call_identify(*args, **kwargs):
-        with open(io.DEBUG_DIR + "log.txt", 'a') as f, contextlib.redirect_stdout(f):
-            return identify(*args, **kwargs)
-
-    out = call_identify(
+    
+    out = call_identify(identify,
         gha=dedent(gha), 
         files=files, 
         input1=input1, 
@@ -149,7 +150,7 @@ def prompt1(gha : str, files: str) -> Tuple[str, str, str]:
     io.write_debug("run.sh", results[0])
     io.write_debug("build.Dockerfile", results[1])
     io.write_debug("build.sh", results[2])
-    return
+    return (results[0],results[1], results[2])
 
 earthly_basics = io.relative_read("data/earthly_docs/basics.md") 
 earthly_reference = io.relative_read("data/earthly_docs/summary.md") 
@@ -232,8 +233,7 @@ def prompt2(files: str, run : str, docker : str, build : str) -> str:
     {{gen "Earthfile" temperature=0 max_tokens=2000}}
     {{~/assistant}}
     '''), llm=gpt4)
-    with open(io.DEBUG_DIR + "log.txt", 'a') as f, contextlib.redirect_stdout(f):
-        out = identify(earthly_basics=earthly_basics, 
+    out = call_identify(identify, earthly_basics=earthly_basics, 
                        input1=input1, 
                        cot1=cot1, 
                        result1=result1, 
@@ -247,8 +247,8 @@ def prompt2(files: str, run : str, docker : str, build : str) -> str:
         raise ValueError(f"1 Files exepected back. Instead got {len(results)}.")
     io.write_debug("EarthfilePlan.md", out["discuss"])
     earthfile = results[0]
-    io.write(earthfile, debug_dir + "Earthfile.1")
-    return
+    io.write_debug("Earthfile.1",earthfile)
+    return earthfile
 
 def prompt3(earthfile: str, gha : str, files: str) ->  str:
     identify = guidance(dedent('''
@@ -305,8 +305,8 @@ def prompt3(earthfile: str, gha : str, files: str) ->  str:
         {{~/assistant}}
 
     '''), llm=gpt4)
-    with open(io.DEBUG_DIR + "log.txt", 'a') as f, contextlib.redirect_stdout(f):
-        out = identify(earthly_basics=earthly_basics, 
+    out = call_identify(identify,
+                   earthly_basics=earthly_basics, 
                    earthly_tips=earthly_tips, 
                    input1=input1, 
                    files=files, 
