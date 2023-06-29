@@ -16,7 +16,7 @@ cot2 = io.relative_read("data/docker_simple/gha_to_bash_prompt_plan.md")
 result2 = io.relative_read("data/docker_simple/gha_to_bash_prompt_result.md")
 
 # Seems like we should pass in file structure as well?
-def prompt1(gha : str, files: str, debug_dir: str) -> Tuple[str, str, str]:
+def prompt1(gha : str, files: str) -> Tuple[str, str, str]:
  
     identify = guidance(dedent('''
     {{#system~}}
@@ -128,7 +128,7 @@ def prompt1(gha : str, files: str, debug_dir: str) -> Tuple[str, str, str]:
     {{gen "files" temperature=0 max_tokens=500}}
     {{~/assistant}}
     '''), llm=gpt4)
-    with open(debug_dir + "log.txt", 'a') as f, contextlib.redirect_stdout(f):
+    with open(io.DEBUG_DIR + "log.txt", 'a') as f, contextlib.redirect_stdout(f):
         out = identify(
             gha=dedent(gha), 
             files=files, 
@@ -156,7 +156,7 @@ input1 = io.relative_read("data/python_lint/files.md")
 cot1 = io.relative_read("data/python_lint/EarthfilePlan.md")
 result1 = io.relative_read("data/python_lint/Earthfile")
 
-def prompt2(files: str, run : str, docker : str, build : str, debug_dir: str) -> str:
+def prompt2(files: str, run : str, docker : str, build : str) -> str:
     identify = guidance(dedent('''
     {{#system~}}
     You are creating an Earthfile from several bash and dockerfiles. I'll share Earthly 
@@ -229,7 +229,7 @@ def prompt2(files: str, run : str, docker : str, build : str, debug_dir: str) ->
     {{gen "Earthfile" temperature=0 max_tokens=2000}}
     {{~/assistant}}
     '''), llm=gpt4)
-    with open(debug_dir + "log.txt", 'a') as f, contextlib.redirect_stdout(f):
+    with open(io.DEBUG_DIR + "log.txt", 'a') as f, contextlib.redirect_stdout(f):
         out = identify(earthly_basics=earthly_basics, 
                        input1=input1, 
                        cot1=cot1, 
@@ -247,7 +247,7 @@ def prompt2(files: str, run : str, docker : str, build : str, debug_dir: str) ->
     io.write(earthfile, debug_dir + "Earthfile.1")
     return
 
-def prompt3(earthfile: str, gha : str, files: str, debug_dir: str) ->  str:
+def prompt3(earthfile: str, gha : str, files: str) ->  str:
     identify = guidance(dedent('''
         {{#system~}}
         Use the below documentation on Earthfiles to do a code conversion task.
@@ -302,7 +302,7 @@ def prompt3(earthfile: str, gha : str, files: str, debug_dir: str) ->  str:
         {{~/assistant}}
 
     '''), llm=gpt4)
-    with open(debug_dir + "log.txt", 'a') as f, contextlib.redirect_stdout(f):
+    with open(io.DEBUG_DIR + "log.txt", 'a') as f, contextlib.redirect_stdout(f):
         out = identify(earthly_basics=earthly_basics, 
                    earthly_tips=earthly_tips, 
                    input1=input1, 

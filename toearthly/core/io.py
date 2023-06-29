@@ -6,7 +6,6 @@ import os
 import glob
 from typing import Tuple
 
-
 memory = Memory(location='data/gpt_cache', verbose=1)
 
 openai.api_key = os.getenv('OPENAI_API_KEY')
@@ -84,7 +83,9 @@ def find_first_yml(path=None) -> Tuple[str,str]:
         raise Exception("No yml files found. Process will stop.")
 
     with open(yml_files[0], 'r') as file:
-        return (file.read(),yml_files[0])
+        yml = file.read()
+    write_debug("workflow.yml", yml)
+    return (yml,yml_files[0])
     
 
 def find_first_dockerfile(path=None) -> str:
@@ -100,7 +101,9 @@ def find_first_dockerfile(path=None) -> str:
         return ""
 
     with open(docker_files[0], 'r') as file:
-        return file.read()
+        dockerfile = file.read()
+    write_debug("Dockerfile", dockerfile)
+    return dockerfile
 
 
 # Like tree but less output
@@ -140,5 +143,5 @@ def print_directory(path, prefix='', level=0, max_level=1) -> str:
                                                        level + 1, 
                                                        max_level)
                     dir_structure += subdir_structure
-
+    write_debug("files.txt", dir_structure)
     return dir_structure

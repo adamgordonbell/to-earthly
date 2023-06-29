@@ -38,7 +38,7 @@ or via https://github.com/adamgordonbell/to-earthly
 def main(input_dir: str, earthfile_path : str) -> None:
     print(intro)
     input("Press Enter to continue...")
-    yml,path = io.find_first_yml(input_dir)
+    yml, path = io.find_first_yml(input_dir)
     print(dedent(f"""
           Input:
           Workflow:\t{path}
@@ -47,24 +47,21 @@ def main(input_dir: str, earthfile_path : str) -> None:
           """))
     file_structure = io.print_directory(input_dir)
     extra_docker_file = io.find_first_dockerfile(input_dir)
-    io.write_debug("workflow.yml", yml)
-    io.write_debug("files.txt", file_structure)
-    io.write_debug("Dockerfile", extra_docker_file)
+    
 
     print("Starting...\n (This may take 10 minutes)")
     print("Running Stage 1")
-    runfile, dockerfile, buildfile = gha_to_bash_prompt.prompt1(yml, file_structure, debug_dir)
+    runfile, dockerfile, buildfile = gha_to_bash_prompt.prompt1(yml, file_structure)
 
     print("Running Stage 2")
     gha_to_bash_prompt.prompt2(
         file_structure, 
         runfile,
         dockerfile, 
-        buildfile,
-        debug_dir)
+        buildfile)
 
     print("Running Stage 3")
-    earthfile = gha_to_bash_prompt.prompt3(earthfile, yml, file_structure, debug_dir)
+    earthfile = gha_to_bash_prompt.prompt3(earthfile, yml, file_structure)
     io.write(earthfile, earthfile_path)
 
 if __name__ == '__main__':
