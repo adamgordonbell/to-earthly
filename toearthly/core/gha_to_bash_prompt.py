@@ -243,7 +243,9 @@ def prompt2(files: str, run : str, docker : str, build : str, debug_dir: str) ->
     if len(results) != 1:
         raise ValueError(f"1 Files exepected back. Instead got {len(results)}.")
     io.write(out["discuss"], debug_dir + "EarthfilePlan.md")
-    return results[0]
+    earthfile = results[0]
+    io.write(earthfile, debug_dir + "Earthfile.1")
+    return
 
 def prompt3(earthfile: str, gha : str, files: str, debug_dir: str) ->  str:
     identify = guidance(dedent('''

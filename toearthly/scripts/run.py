@@ -56,13 +56,12 @@ def main(input_dir: str, earthfile_path : str, debug_dir: str) -> None:
     runfile, dockerfile, buildfile = gha_to_bash_prompt.prompt1(yml, file_structure, debug_dir)
 
     print("Running Stage 2")
-    earthfile = gha_to_bash_prompt.prompt2(
+    gha_to_bash_prompt.prompt2(
         file_structure, 
         runfile,
         dockerfile, 
         buildfile,
         debug_dir)
-    io.write(earthfile, debug_dir + "Earthfile.1")
 
     print("Running Stage 3")
     earthfile = gha_to_bash_prompt.prompt3(earthfile, yml, file_structure, debug_dir)
