@@ -43,7 +43,7 @@ def main(input_dir: str, earthfile_path : str, debug_dir: str) -> None:
           Input:
           Workflow:\t{path}
           Output:\t\t{earthfile_path}
-          Debug files:\t{output_dir}
+          Debug files:\t{debug_dir}
           """))
     file_structure = io.print_directory(input_dir)
     extra_docker_file = io.find_first_dockerfile(input_dir)
