@@ -138,14 +138,14 @@ def prompt1(gha : str, files: str, debug_dir: str) -> Tuple[str, str, str]:
             input2=input2, 
             cot2=cot2, 
             result2=result2)
-    io.write(out["discuss"], debug_dir + "gha_to_bash_prompt_plan.md")
-    io.write(out["files"], debug_dir + "gha_to_bash_prompt_result.md")
+    io.write_debug("gha_to_bash_prompt_plan.md", out["discuss"])
+    io.write_debug("gha_to_bash_prompt_result.md", out["files"])
     results = markdown.extract_code_blocks(out["files"])
     if len(results) != 3:
         raise ValueError(f"3 Files exepected back. Instead got {len(results)}")
-    io.write(results[0], debug_dir + "run.sh")
-    io.write(results[1], debug_dir + "build.Dockerfile")
-    io.write(results[2], debug_dir + "build.sh")
+    io.write_debug("run.sh", results[0])
+    io.write_debug("build.Dockerfile", results[1])
+    io.write_debug("build.sh", results[2])
     return
 
 earthly_basics = io.relative_read("data/earthly_docs/basics.md") 
@@ -242,7 +242,7 @@ def prompt2(files: str, run : str, docker : str, build : str, debug_dir: str) ->
 
     if len(results) != 1:
         raise ValueError(f"1 Files exepected back. Instead got {len(results)}.")
-    io.write(out["discuss"], debug_dir + "EarthfilePlan.md")
+    io.write_debug("EarthfilePlan.md", out["discuss"])
     earthfile = results[0]
     io.write(earthfile, debug_dir + "Earthfile.1")
     return
@@ -309,7 +309,7 @@ def prompt3(earthfile: str, gha : str, files: str, debug_dir: str) ->  str:
                    files=files, 
                    gha=gha,
                    earthfile=earthfile)
-    io.write(out["discuss"], debug_dir + "EarthfileFixPlan.md")
+    io.write_debug("EarthfileFixPlan.md", out["discuss"])
     results = markdown.extract_code_blocks(out["Earthfile"])
     if len(results) != 1:
         raise ValueError(f"1 Files exepected back. Instead got {len(results)}.")
