@@ -128,7 +128,7 @@ def prompt1(gha : str, files: str, debug_dir: str) -> Tuple[str, str, str]:
     {{gen "files" temperature=0 max_tokens=500}}
     {{~/assistant}}
     '''), llm=gpt4)
-    with open(os.devnull, 'w') as f, contextlib.redirect_stdout(f):
+    with open(debug_dir + "log.txt", 'a') as f, contextlib.redirect_stdout(f):
         out = identify(
             gha=dedent(gha), 
             files=files, 
@@ -226,7 +226,7 @@ def prompt2(files: str, run : str, docker : str, build : str) ->  Tuple[str,str]
     {{gen "Earthfile" temperature=0 max_tokens=2000}}
     {{~/assistant}}
     '''), llm=gpt4)
-    with open(os.devnull, 'w') as f, contextlib.redirect_stdout(f):
+    with open(debug_dir + "log.txt", 'a') as f, contextlib.redirect_stdout(f):
         out = identify(earthly_basics=earthly_basics, 
                        input1=input1, 
                        cot1=cot1, 
@@ -296,7 +296,7 @@ def prompt3(earthfile: str, gha : str, files: str) ->  Tuple[str,str]:
         {{~/assistant}}
 
     '''), llm=gpt4)
-    with open(os.devnull, 'w') as f, contextlib.redirect_stdout(f):
+    with open(debug_dir + "log.txt", 'a') as f, contextlib.redirect_stdout(f):
         out = identify(earthly_basics=earthly_basics, 
                    earthly_tips=earthly_tips, 
                    input1=input1, 
