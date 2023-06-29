@@ -4,7 +4,7 @@ import openai
 import time
 import os
 import glob
-from typing import Tuple
+from typing import Tuple, List
 
 memory = Memory(location='data/gpt_cache', verbose=1)
 
@@ -86,6 +86,20 @@ def find_first_yml(path=None) -> Tuple[str,str]:
         yml = file.read()
     write_debug("workflow.yml", yml)
     return (yml,yml_files[0])
+
+def find_workflows(path=None) -> List[str]:
+    if path is None:
+        path = os.getcwd()
+        
+    if not path.endswith("/"):
+        path += "/"
+
+    yml_files = glob.glob(path + ".github/workflows/*.yml")
+
+    if not yml_files:
+        raise Exception("No yml files found. Process will stop.")
+
+    return yml_files
     
 
 def find_first_dockerfile(path=None) -> str:

@@ -1,5 +1,7 @@
 from textwrap import dedent
 import argparse
+import inquirer
+from typing import Tuple
 
 from toearthly.core import io, gha_to_bash_prompt
 
@@ -35,11 +37,27 @@ I'll prioritize these based on feedback. So reach out on slack or via adam@earth
 or via https://github.com/adamgordonbell/to-earthly
 """
 
+def select_workflow(input_dir : str) -> Tuple[str,str]:
+    ymls = io.find_workflows(input_dir)
+    if(len(ymls)!= 1):
+        questions = [
+            inquirer.List('option',
+                            message="Select a github workflow",
+                            choices=ymls,
+                            ),
+        ]
+        answers = inquirer.prompt(questions)
+        path = answers['option']
+    else:
+        yml = ymls[0]
+    with open(path, 'r') as file:
+        yml = file.read()
+    return (path, yml)
+
 def main(input_dir: str, earthfile_path : str) -> None:
     print(intro)
-    yml, path = io.find_first_yml(input_dir)
+    path, yml = select_workflow(input_dir)
 
-    input("Press Enter to continue...")
     print(dedent(f"""
           Input:
           Workflow:\t{path}
