@@ -15,7 +15,7 @@ cot2 = io.relative_read("data/docker_simple/gha_to_bash_prompt_plan.md")
 result2 = io.relative_read("data/docker_simple/gha_to_bash_prompt_result.md")
 
 def call_identify(identify, *args, **kwargs):
-    with open(constants.DEBUG_DIR + "log.txt", 'a') as f, contextlib.redirect_stdout(f):
+    with open(constants.DEBUG_DIR + "log.txt", 'a') as f, contextlib.redirect_stdout(f), contextlib.redirect_stderr(f):
         return identify(*args, **kwargs)
 
 # Seems like we should pass in file structure as well?
