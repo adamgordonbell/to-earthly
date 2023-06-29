@@ -2,8 +2,9 @@ from textwrap import dedent
 import argparse
 import inquirer
 from typing import Tuple
+import openai
 
-from toearthly.core import io, gha_to_bash_prompt, constants
+from toearthly.core import io, gha_to_bash_prompt, constants, boot # noqa: F401
 
 # Default directories
 DEFAULT_INPUT_DIR = '/input/'
@@ -54,7 +55,6 @@ def select_workflow(input_dir : str) -> Tuple[str,str]:
         yml = file.read()
     return (path, yml)
 
-import openai
 
 def main(input_dir: str, earthfile_path : str) -> None:
     try:
@@ -68,7 +68,7 @@ def main(input_dir: str, earthfile_path : str) -> None:
               Debug files:\t{constants.DEBUG_DIR}
               """))
         file_structure = io.print_directory(input_dir)
-        extra_docker_file = io.find_first_dockerfile(input_dir)
+        io.find_first_dockerfile(input_dir)
 
         print("Starting...\n (This may take 10 minutes)")
         print("Running Stage 1")
