@@ -62,13 +62,12 @@ def main(input_dir: str, earthfile_path : str, debug_dir: str) -> None:
     io.write(buildfile, debug_dir + "build.sh")
 
     print("Running Stage 2")
-    discuss, earthfile = gha_to_bash_prompt.prompt2(
+    earthfile = gha_to_bash_prompt.prompt2(
         file_structure, 
         runfile,
         dockerfile, 
         buildfile,
         debug_dir)
-    io.write(discuss, debug_dir + "EarthfilePlan.md")
     io.write(earthfile, debug_dir + "Earthfile.1")
 
     print("Running Stage 3")

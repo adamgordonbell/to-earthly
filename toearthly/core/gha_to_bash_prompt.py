@@ -153,7 +153,7 @@ input1 = io.relative_read("data/python_lint/files.md")
 cot1 = io.relative_read("data/python_lint/EarthfilePlan.md")
 result1 = io.relative_read("data/python_lint/Earthfile")
 
-def prompt2(files: str, run : str, docker : str, build : str, debug_dir: str) ->  Tuple[str,str]:
+def prompt2(files: str, run : str, docker : str, build : str, debug_dir: str) -> str:
     identify = guidance(dedent('''
     {{#system~}}
     You are creating an Earthfile from several bash and dockerfiles. I'll share Earthly 
@@ -239,7 +239,8 @@ def prompt2(files: str, run : str, docker : str, build : str, debug_dir: str) ->
 
     if len(results) != 1:
         raise ValueError(f"1 Files exepected back. Instead got {len(results)}.")
-    return (out["discuss"],results[0])
+    io.write(out["discuss"], debug_dir + "EarthfilePlan.md")
+    return results[0]
 
 def prompt3(earthfile: str, gha : str, files: str, debug_dir: str) ->  Tuple[str,str]:
     identify = guidance(dedent('''
