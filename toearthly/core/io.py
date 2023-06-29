@@ -159,3 +159,7 @@ def print_directory(path, prefix='', level=0, max_level=1) -> str:
                     dir_structure += subdir_structure
     write_debug("files.txt", dir_structure)
     return dir_structure
+
+def log(message: str) -> None:
+    with open(os.path.join(constants.DEBUG_DIR, 'log.txt'), 'a') as log_file:
+        log_file.write(message + '\n')
