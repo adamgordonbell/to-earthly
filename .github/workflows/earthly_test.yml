@@ -12,10 +12,7 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-
     - name: Install earthly
-      run: |
-        sudo /bin/sh -c "$(curl -fsSL https://raw.githubusercontent.com/earthly/earthly/main/install.sh)"
-
+      run: "sudo /bin/sh -c 'wget https://github.com/earthly/earthly/releases/download/v0.7.0/earthly-linux-amd64 -O /usr/local/bin/earthly && chmod +x /usr/local/bin/earthly'"
     - name: Run earthly +test
       run: earthly +test
