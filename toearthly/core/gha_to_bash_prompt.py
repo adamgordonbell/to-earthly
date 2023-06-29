@@ -16,7 +16,9 @@ cot2 = io.relative_read("data/docker_simple/gha_to_bash_prompt_plan.md")
 result2 = io.relative_read("data/docker_simple/gha_to_bash_prompt_result.md")
 
 # Seems like we should pass in file structure as well?
-def prompt1(gha : str, files: str, debug_dir: str) -> Tuple[str, str, str]:
+from toearthly.scripts.run import debug_dir
+
+def prompt1(gha : str, files: str) -> Tuple[str, str, str]:
  
     identify = guidance(dedent('''
     {{#system~}}
