@@ -67,6 +67,7 @@ def write(contents: str, filepath: str) -> None:
 
 def write_debug(filename: str, contents: str) -> None:
     filepath = os.path.join(constants.DEBUG_DIR, filename)
+    os.makedirs(constants.DEBUG_DIR, exist_ok=True)
     with open(filepath, 'w') as outfile:
         outfile.write(contents)
 
@@ -161,5 +162,9 @@ def print_directory(path, prefix='', level=0, max_level=1) -> str:
     return dir_structure
 
 def log(message: str) -> None:
-    with open(os.path.join(constants.DEBUG_DIR, 'log.txt'), 'a') as log_file:
+    log_file_path = os.path.join(constants.DEBUG_DIR, 'log.txt')
+    os.makedirs(constants.DEBUG_DIR, exist_ok=True)
+
+    with open(log_file_path, 'a') as log_file:
         log_file.write(message + '\n')
+

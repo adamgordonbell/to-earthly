@@ -3,6 +3,7 @@ import argparse
 import inquirer
 from typing import Tuple
 import openai
+import traceback
 
 from toearthly.core import io, gha_to_bash_prompt, constants, boot # noqa: F401
 
@@ -89,7 +90,8 @@ def main(input_dir: str, earthfile_path : str) -> None:
         io.log(f"Error Type: openai.error.InvalidRequestError \n Error details: {e}")
     except Exception as e:
         print("An unexpected error occurred.")
-        io.log(f"Error Type: {type(e).__name__} \n Error details: {e}")
+        trace = traceback.format_exc()
+        io.log(f"Error Type: {type(e).__name__} \n Error details: {e} \n Stack Trace: {trace}")
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
