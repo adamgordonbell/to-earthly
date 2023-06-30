@@ -1,7 +1,6 @@
 from textwrap import dedent
 import contextlib
-from toearthly.core import io, markdown
-import os
+from toearthly.core import io, markdown, constants
 import guidance
 from typing import Tuple
 
@@ -16,8 +15,10 @@ cot2 = io.relative_read("data/docker_simple/gha_to_bash_prompt_plan.md")
 result2 = io.relative_read("data/docker_simple/gha_to_bash_prompt_result.md")
 
 def call_identify(identify, *args, **kwargs):
-        with open(io.DEBUG_DIR + "log.txt", 'a') as f, contextlib.redirect_stdout(f):
-            return identify(*args, **kwargs)
+    with open(constants.DEBUG_DIR + "log.txt", 'a') as f, \
+            contextlib.redirect_stdout(f), \
+            contextlib.redirect_stderr(f):
+        return identify(*args, **kwargs)
 
 # Seems like we should pass in file structure as well?
 def prompt1(gha : str, files: str) -> Tuple[str, str, str]:
@@ -241,11 +242,10 @@ def prompt2(files: str, run : str, docker : str, build : str) -> str:
                        run=run,
                        docker=docker, 
                        build=build)
+    io.write_debug("EarthfilePlan.md", out["discuss"])
     results = markdown.extract_code_blocks(out["Earthfile"])
-
     if len(results) != 1:
         raise ValueError(f"1 Files exepected back. Instead got {len(results)}.")
-    io.write_debug("EarthfilePlan.md", out["discuss"])
     earthfile = results[0]
     io.write_debug("Earthfile.1",earthfile)
     return earthfile

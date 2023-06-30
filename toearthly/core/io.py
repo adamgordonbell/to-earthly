@@ -5,6 +5,7 @@ import time
 import os
 import glob
 from typing import Tuple, List
+from toearthly.core import constants
 
 memory = Memory(location='data/gpt_cache', verbose=1)
 
@@ -63,10 +64,9 @@ def write(contents: str, filepath: str) -> None:
     with open(filepath, 'w') as outfile:
         outfile.write(contents)
 
-DEBUG_DIR = '/input/.to_earthly/'
 
 def write_debug(filename: str, contents: str) -> None:
-    filepath = os.path.join(DEBUG_DIR, filename)
+    filepath = os.path.join(constants.DEBUG_DIR, filename)
     with open(filepath, 'w') as outfile:
         outfile.write(contents)
 
@@ -159,3 +159,7 @@ def print_directory(path, prefix='', level=0, max_level=1) -> str:
                     dir_structure += subdir_structure
     write_debug("files.txt", dir_structure)
     return dir_structure
+
+def log(message: str) -> None:
+    with open(os.path.join(constants.DEBUG_DIR, 'log.txt'), 'a') as log_file:
+        log_file.write(message + '\n')

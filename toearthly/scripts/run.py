@@ -2,8 +2,9 @@ from textwrap import dedent
 import argparse
 import inquirer
 from typing import Tuple
+import openai
 
-from toearthly.core import io, gha_to_bash_prompt
+from toearthly.core import io, gha_to_bash_prompt, constants, boot # noqa: F401
 
 # Default directories
 DEFAULT_INPUT_DIR = '/input/'
@@ -49,38 +50,46 @@ def select_workflow(input_dir : str) -> Tuple[str,str]:
         answers = inquirer.prompt(questions)
         path = answers['option']
     else:
-        yml = ymls[0]
+        path = ymls[0]
     with open(path, 'r') as file:
         yml = file.read()
     return (path, yml)
 
+
 def main(input_dir: str, earthfile_path : str) -> None:
-    print(intro)
-    path, yml = select_workflow(input_dir)
+    try:
+        print(intro)
+        path, yml = select_workflow(input_dir)
 
-    print(dedent(f"""
-          Input:
-          Workflow:\t{path}
-          Output:\t\t{earthfile_path}
-          Debug files:\t{io.DEBUG_DIR}
-          """))
-    file_structure = io.print_directory(input_dir)
-    extra_docker_file = io.find_first_dockerfile(input_dir)
+        print(dedent(f"""
+              Input:
+              Workflow:\t{path}
+              Output:\t\t{earthfile_path}
+              Debug files:\t{constants.DEBUG_DIR}
+              """))
+        file_structure = io.print_directory(input_dir)
+        io.find_first_dockerfile(input_dir)
 
-    print("Starting...\n (This may take 10 minutes)")
-    print("Running Stage 1")
-    runfile, dockerfile, buildfile = gha_to_bash_prompt.prompt1(yml, file_structure)
+        print("Starting...\n (This may take 10 minutes)")
+        print("Running Stage 1")
+        runfile, dockerfile, buildfile = gha_to_bash_prompt.prompt1(yml, file_structure)
 
-    print("Running Stage 2")
-    earthfile = gha_to_bash_prompt.prompt2(
-        file_structure, 
-        runfile,
-        dockerfile, 
-        buildfile)
+        print("Running Stage 2")
+        earthfile = gha_to_bash_prompt.prompt2(
+            file_structure, 
+            runfile,
+            dockerfile, 
+            buildfile)
 
-    print("Running Stage 3")
-    earthfile = gha_to_bash_prompt.prompt3(earthfile, yml, file_structure)
-    io.write(earthfile, earthfile_path)
+        print("Running Stage 3")
+        earthfile = gha_to_bash_prompt.prompt3(earthfile, yml, file_structure)
+        io.write(constants.EARTHLY_WARNING + earthfile, earthfile_path)
+    except openai.error.InvalidRequestError as e:
+        print("We were unable to convert this workflow.")
+        io.log(f"Error Type: openai.error.InvalidRequestError \n Error details: {e}")
+    except Exception as e:
+        print("An unexpected error occurred.")
+        io.log(f"Error Type: {type(e).__name__} \n Error details: {e}")
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -92,6 +101,6 @@ if __name__ == '__main__':
                         default=DEFAULT_DEBUG_DIR)
     args = parser.parse_args()
 
-    io.DEBUG_DIR = args.debug_dir
+    constants.DEBUG_DIR = args.debug_dir
 
     main(args.input_dir, args.earthfile)
